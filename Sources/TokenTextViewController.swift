@@ -12,8 +12,11 @@ public protocol TokenTextViewControllerDelegate: class {
     /// Whether an edit should be accepted.
     func tokenTextViewShouldChangeTextInRange(_ sender: TokenTextViewController, range: NSRange, replacementText text: String) -> Bool
 
-    /// Called when a token was tapped.
-    func tokenTextViewDidSelectToken(_ sender: TokenTextViewController, tokenRef: TokenReference, fromRect rect: CGRect)
+	/// Called when a token was tapped.
+	func tokenTextViewDidSelectToken(_ sender: TokenTextViewController, tokenRef: TokenReference, fromRect rect: CGRect)
+	
+	/// Called when a token was de-selected.
+	func tokenTextViewDidDeselectToken(_ sender: TokenTextViewController, tokenRef: TokenReference)
 
     /// Called when a token was deleted.
     func tokenTextViewDidDeleteToken(_ sender: TokenTextViewController, tokenRef: TokenReference)
@@ -148,6 +151,18 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             tokenTextStorage.font = font
         }
     }
+	
+	/// Determines whether multiple tokens can be selected at once, or only a single token.
+	public enum SelectionMode {
+		case single
+		case multiple
+	}
+	
+	/// The current selection mode. Defaults to `.single`.
+	public var selectionMode: SelectionMode = .single
+	
+	/// All selected tokens
+	public var selectedToken: TokenReference?
 
     /// Flag for text tokenization when input field loses focus
     public var tokenizeOnLostFocus = false
@@ -634,6 +649,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
                         return CGRect(origin: location, size: CGSize.zero)
                     }
                 }()
+				self.selectedToken = tokenRef
                 delegate?.tokenTextViewDidSelectToken(self, tokenRef: tokenRef, fromRect: rect)
             }
         }
@@ -728,6 +744,13 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             delegate?.tokenTextViewDidDeleteToken(self, tokenRef: tokenRef)
         }
     }
+	
+	public func textViewDidBeginEditing(_ textView: UITextView) {
+		if let selectedToken = self.selectedToken {
+			delegate?.tokenTextViewDidDeselectToken(self, tokenRef: selectedToken)
+			self.selectedToken = nil
+		}
+	}
 
     public func textViewDidEndEditing(_ textView: UITextView) {
         if tokenizeOnLostFocus {
