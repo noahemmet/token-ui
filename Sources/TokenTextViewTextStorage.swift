@@ -6,9 +6,7 @@ import UIKit
 protocol TokenTextViewTextStorageDelegate: class {
 
     func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]?
-    func textStorageBackgroundColourForTokenRef(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> UIColor?
-    func textStorageForegroundColourForTokenRef(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> UIColor?
-
+	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay?
 }
 
 class TokenTextViewTextStorage: NSTextStorage {
@@ -96,13 +94,10 @@ class TokenTextViewTextStorage: NSTextStorage {
 
         enumerateTokens(inRange: searchRange) { (tokenRef, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
-            if let backgroundColor = self.formattingDelegate?.textStorageBackgroundColourForTokenRef(self, tokenRef: tokenRef) {
-                tokenFormattingAttributes[.backgroundColor] = backgroundColor
+			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: tokenRef) {
+                tokenFormattingAttributes[.backgroundColor] = tokenDisplay.backgroundColor
+				tokenFormattingAttributes[.foregroundColor] = tokenDisplay.textColor
             }
-            if let foregroundColor = self.formattingDelegate?.textStorageForegroundColourForTokenRef(self, tokenRef: tokenRef) {
-                tokenFormattingAttributes[.foregroundColor] = foregroundColor
-            }
-
             let formattingRange = self.displayRangeFromTokenRange(tokenRange)
             self.addAttributes(tokenFormattingAttributes, range: formattingRange)
 

@@ -24,11 +24,8 @@ public protocol TokenTextViewControllerDelegate: class {
     /// Called when the formatting is being updated.
     func tokenTextViewTextStorageIsUpdatingFormatting(_ sender: TokenTextViewController, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
 
-    /// Allows to customize the background color for a token.
-    func tokenTextViewBackgroundColourForTokenRef(_ sender: TokenTextViewController, tokenRef: TokenReference) -> UIColor?
-
-    /// Allows to customize the foreground color for a token
-    func tokenTextViewForegroundColourForTokenRef(_ sender: TokenTextViewController, tokenRef: TokenReference) -> UIColor?
+    /// Allows display customization of a token.
+    func tokenDisplay(_ sender: TokenTextViewController, tokenRef: TokenReference) -> TokenDisplay?
 
     /// Whether the last edit should cancel token editing.
     func tokenTextViewShouldCancelEditingAtInsert(_ sender: TokenTextViewController, newText: String, inputText: String) -> Bool
@@ -97,6 +94,20 @@ public struct TokenTextViewControllerConstants {
     static let inputTextAttributeAnchorValue = "anchor"
     static let inputTextAttributeTextValue = "text"
 
+}
+
+/// Colors for a token.
+public struct TokenDisplay {
+	public static let defaultDisplay = TokenDisplay(textColor: .white, backgroundColor: .lightGray)
+	public var textColor: UIColor
+	public var backgroundColor: UIColor
+	public var font: UIFont?
+	
+	public init(textColor: UIColor, backgroundColor: UIColor, font: UIFont? = nil) {
+		self.textColor = textColor
+		self.backgroundColor = backgroundColor
+		self.font = font
+	}
 }
 
 public typealias TokenReference = String
@@ -740,10 +751,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]? {
         return delegate?.tokenTextViewTextStorageIsUpdatingFormatting(self, text: text, searchRange: searchRange)
     }
-
-    func textStorageBackgroundColourForTokenRef(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> UIColor? {
-        return delegate?.tokenTextViewBackgroundColourForTokenRef(self, tokenRef: tokenRef)
-    }
+	
+	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay? {
+		let tokenDisplay = delegate?.tokenDisplay(self, tokenRef: tokenRef) ?? TokenDisplay.defaultDisplay
+		return tokenDisplay
+	}
 
     func textStorageForegroundColourForTokenRef(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> UIColor? {
         return delegate?.tokenTextViewForegroundColourForTokenRef(self, tokenRef: tokenRef)
