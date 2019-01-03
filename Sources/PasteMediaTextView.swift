@@ -1,6 +1,7 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
 import Foundation
+import CommonUI
 import UIKit
 import MobileCoreServices
 
@@ -35,7 +36,7 @@ public struct PasteboardItem {
 }
 
 /// A custom `UITextView` subclass used to accept specific `PasteboardItemType`'s.
-public class PasteMediaTextView: UITextView {
+public class PasteMediaTextView: TextView {
 
     weak var mediaPasteDelegate: PasteMediaTextViewPasteDelegate?
 

@@ -1,6 +1,7 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
 import Foundation
+import CommonUI
 import UIKit
 
 /// The delegate used to handle user interaction and enable/disable customization to a `TokenTextViewController`.
@@ -209,8 +210,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         self.view = textView
     }
 
-    fileprivate var viewAsTextView: UITextView! {
-        return (view as! UITextView)
+    public var viewAsTextView: TextView! {
+        return (view as! TextView)
     }
 
     fileprivate var tokenTextStorage: TokenTextViewTextStorage {
