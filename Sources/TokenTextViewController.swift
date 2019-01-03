@@ -152,17 +152,10 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         }
     }
 	
-	/// Determines whether multiple tokens can be selected at once, or only a single token.
-	public enum SelectionMode {
-		case single
-		case multiple
+	/// A selected token
+	public var selectedToken: TokenReference? {
+		return tokenTextStorage.selectedToken
 	}
-	
-	/// The current selection mode. Defaults to `.single`.
-	public var selectionMode: SelectionMode = .single
-	
-	/// All selected tokens
-	public var selectedToken: TokenReference?
 
     /// Flag for text tokenization when input field loses focus
     public var tokenizeOnLostFocus = false
@@ -175,14 +168,25 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     /// Initializer for `self`.
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+		commonInit()
     }
+	
+	/// Initializer for `self`.
+	public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+		commonInit()
+	}
 
     /// Initializer for `self`.
     public init() {
         super.init(nibName: nil, bundle: nil)
-        inputModeHandler = TokenTextViewControllerInputModeHandler(tokenTextViewController: self)
-        textTappedHandler = normalModeTapHandler
+		commonInit()
     }
+	
+	private func commonInit() {
+		inputModeHandler = TokenTextViewControllerInputModeHandler(tokenTextViewController: self)
+		textTappedHandler = normalModeTapHandler
+	}
 
     /// Loads a `PasteMediaTextView` as the base view of `self`.
     override open func loadView() {
@@ -641,6 +645,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if let charIndex = viewAsTextView.characterIndexAtLocation(location), charIndex < viewAsTextView.textStorage.length - 1 {
             var range = NSRange(location: 0, length: 0)
             if let tokenRef = viewAsTextView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeName, at: charIndex, effectiveRange: &range) as? TokenReference {
+				// Token was selected
                 _ = resignFirstResponder()
                 let rect: CGRect = {
                     if let textRange = viewAsTextView.textRangeFromNSRange(range) {
@@ -649,9 +654,17 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
                         return CGRect(origin: location, size: CGSize.zero)
                     }
                 }()
-				self.selectedToken = tokenRef
+				self.tokenTextStorage.selectedToken = tokenRef
                 delegate?.tokenTextViewDidSelectToken(self, tokenRef: tokenRef, fromRect: rect)
-            }
+			} else {
+				if let selectedToken = self.selectedToken {
+					// Deselect token
+					self.tokenTextStorage.selectedToken = nil
+					delegate?.tokenTextViewDidDeselectToken(self, tokenRef: selectedToken)
+				}
+				// Set cursor at tap point
+				self.viewAsTextView.selectedRange = NSRange(location: charIndex, length: 0)
+			}
         }
     }
 
@@ -744,13 +757,6 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             delegate?.tokenTextViewDidDeleteToken(self, tokenRef: tokenRef)
         }
     }
-	
-	public func textViewDidBeginEditing(_ textView: UITextView) {
-		if let selectedToken = self.selectedToken {
-			delegate?.tokenTextViewDidDeselectToken(self, tokenRef: selectedToken)
-			self.selectedToken = nil
-		}
-	}
 
     public func textViewDidEndEditing(_ textView: UITextView) {
         if tokenizeOnLostFocus {
@@ -779,10 +785,6 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		let tokenDisplay = delegate?.tokenDisplay(self, tokenRef: tokenRef) ?? TokenDisplay.defaultDisplay
 		return tokenDisplay
 	}
-
-    func textStorageForegroundColourForTokenRef(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> UIColor? {
-        return delegate?.tokenTextViewForegroundColourForTokenRef(self, tokenRef: tokenRef)
-    }
 
     // MARK: Token text management
 
