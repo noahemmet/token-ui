@@ -668,14 +668,21 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
                         return CGRect(origin: location, size: CGSize.zero)
                     }
                 }()
-				self.tokenTextStorage.selectedToken = tokenRef
-                delegate?.tokenTextViewDidSelectToken(self, tokenRef: tokenRef, fromRect: rect)
+				if self.selectedToken == tokenRef {
+					// Token was tapped again; deselect it.
+					self.tokenTextStorage.selectedToken = nil
+					delegate?.tokenTextViewDidDeselectToken(self, tokenRef: tokenRef)
+				} else {
+					tokenTextStorage.selectedToken = tokenRef
+					delegate?.tokenTextViewDidSelectToken(self, tokenRef: tokenRef, fromRect: rect)
+				}
 			} else {
 				if let selectedToken = self.selectedToken {
-					// Deselect token
-					self.tokenTextStorage.selectedToken = nil
+					// Text was tapepd; deselect token
+					tokenTextStorage.selectedToken = nil
 					delegate?.tokenTextViewDidDeselectToken(self, tokenRef: selectedToken)
 				}
+				self.textView.reloadInputViews()
 				// Set cursor at tap point
 				self.textView.selectedRange = NSRange(location: charIndex, length: 0)
 			}
