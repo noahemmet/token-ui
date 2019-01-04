@@ -61,11 +61,6 @@ public extension TokenTextViewControllerDelegate {
 
     }
 
-    /// Default color of white.
-    func tokenTextViewForegroundColourForTokenRef(_ sender: TokenTextViewController, tokenRef: TokenReference) -> UIColor? {
-        return .white
-    }
-
 }
 
 /// The delegate used to handle text input in a `TokenTextViewController`.
@@ -106,11 +101,18 @@ public struct TokenDisplay {
 	public var textColor: UIColor
 	public var backgroundColor: UIColor
 	public var font: UIFont?
+	// These don't do anything yet.
+	public var xInset: CGFloat
+	public var yInset: CGFloat
+	public var cornerRadius: CGFloat
 	
-	public init(textColor: UIColor, backgroundColor: UIColor, font: UIFont? = nil) {
+	public init(textColor: UIColor, backgroundColor: UIColor, font: UIFont? = nil, xInset: CGFloat = -6, yInset: CGFloat = 1, cornerRadius: CGFloat = 20) {
 		self.textColor = textColor
 		self.backgroundColor = backgroundColor
 		self.font = font
+		self.xInset = xInset
+		self.yInset = yInset
+		self.cornerRadius = cornerRadius
 	}
 }
 
@@ -128,6 +130,13 @@ public struct TokenInformation {
     /// The range of text that contains the `Token`.
     public var range: NSRange
 
+}
+
+extension TokenTextViewController {
+	public enum Segment {
+		case text(String)
+		case token(TokenInformation)
+	}
 }
 
 /// Used to display a `UITextView` that creates and responds to `Token`'s as the user types and taps.
@@ -213,6 +222,10 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     public var textView: TextView! {
         return (view as! TextView)
     }
+	
+	public var segments: [Segment] {
+		return tokenTextStorage.segments
+	}
 
     fileprivate var tokenTextStorage: TokenTextViewTextStorage {
         return textView.textStorage as! TokenTextViewTextStorage

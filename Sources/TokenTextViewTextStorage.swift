@@ -161,6 +161,24 @@ class TokenTextViewTextStorage: NSTextStorage {
         }
         return tokenArray
     }
+	
+	var segments: [TokenTextViewController.Segment] {
+		var segments: [TokenTextViewController.Segment] = []
+		enumerateAttributes(in: NSRange(location: 0, length: length), options: []) { (attributes, range, stop) in
+			let text = self.attributedSubstring(from: range).string
+			if let tokenRef = attributes[TokenTextViewControllerConstants.tokenAttributeName] as? TokenReference {
+				guard text != " " else {
+					// We're prepending all tokens with a " " for some reason; let's ignore it til we can find out why.
+					return
+				}
+				let tokenInfo = TokenInformation(reference: tokenRef, text: text, range: range)
+				segments.append(.token(tokenInfo))
+			} else {
+				segments.append(.text(text))
+			}
+		}
+		return segments
+	}
 
     func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ tokenRef: TokenReference, _ tokenRange: NSRange) -> ObjCBool) {
         let searchRange = range ?? NSRange(location: 0, length: length)
