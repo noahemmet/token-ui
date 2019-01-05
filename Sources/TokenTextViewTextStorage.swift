@@ -24,7 +24,9 @@ class TokenTextViewTextStorage: NSTextStorage {
     var linkColor = Defaults.linkColor
     var textColor = Defaults.textColor
     weak var formattingDelegate: TokenTextViewTextStorageDelegate?
-
+	
+	var selectedToken: TokenReference?
+	
     // MARK: Reading Text
 
     override var string: String {

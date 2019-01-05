@@ -8,22 +8,22 @@ import UIKit
 public protocol TokenTextViewControllerDelegate: class {
 
     /// Called when text changes.
-    func tokenTextViewDidChange(_ sender: TokenTextViewController)
+    func tokenTextViewControllerDidChange(_ sender: TokenTextViewController)
 
     /// Whether an edit should be accepted.
-    func tokenTextViewShouldChangeTextInRange(_ sender: TokenTextViewController, range: NSRange, replacementText text: String) -> Bool
+    func tokenTextViewController(_ sender: TokenTextViewController, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
 
 	/// Called when a token was tapped.
-	func tokenTextViewDidSelectToken(_ sender: TokenTextViewController, tokenRef: TokenReference, fromRect rect: CGRect)
+	func tokenTextViewController(_ sender: TokenTextViewController, didSelectToken tokenInfo: TokenInformation, inRect rect: CGRect)
 	
 	/// Called when a token was de-selected.
-	func tokenTextViewDidDeselectToken(_ sender: TokenTextViewController, tokenRef: TokenReference)
+	func tokenTextViewController(_ sender: TokenTextViewController, didDeselectToken tokenInfo: TokenInformation)
 
     /// Called when a token was deleted.
-    func tokenTextViewDidDeleteToken(_ sender: TokenTextViewController, tokenRef: TokenReference)
+    func tokenTextViewController(_ sender: TokenTextViewController, didDeleteToken tokenInfo: TokenInformation)
 
     /// Called when a token was added.
-    func tokenTextViewDidAddToken(_ sender: TokenTextViewController, tokenRef: TokenReference)
+    func tokenTextViewController(_ sender: TokenTextViewController, didAddToken tokenInfo: TokenInformation)
 
     /// Called when the formatting is being updated.
     func tokenTextViewTextStorageIsUpdatingFormatting(_ sender: TokenTextViewController, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
@@ -448,7 +448,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let tokenRange = tokenAtLocation(startIndex)!.range
         let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeName] as! TokenReference
         let tokenInfo = TokenInformation(reference: tokenRef, text: effectiveText, range: tokenRange)
-        delegate?.tokenTextViewDidChange(self)
+        delegate?.tokenTextViewControllerDidChange(self)
         delegate?.tokenTextViewDidAddToken(self, tokenRef: tokenRef)
         return tokenInfo
     }
@@ -469,15 +469,16 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let effectiveText = effectiveTokenDisplayText(newText)
         replaceTokenText(tokenRef, newText: effectiveText)
         repositionCursorAtEndOfRange()
-        self.delegate?.tokenTextViewDidChange(self)
+        self.delegate?.tokenTextViewControllerDidChange(self)
     }
 
     /// Delegates the given `Token` and informs the delegate of the change.
     open func deleteToken(_ tokenRef: TokenReference) {
+		let tokenInfo = self.tokenInfo(for: tokenRef)
         replaceTokenText(tokenRef, newText: "")
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
-        self.delegate?.tokenTextViewDidChange(self)
-        delegate?.tokenTextViewDidDeleteToken(self, tokenRef: tokenRef)
+        self.delegate?.tokenTextViewControllerDidChange(self)
+        delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
@@ -501,6 +502,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     open var tokenList: [TokenInformation] {
         return tokenTextStorage.tokenList
     }
+	
+	public func tokenInfo(for tokenRef: TokenReference) -> TokenInformation {
+		return tokenList.first { $0.reference == tokenRef }!
+	}
+	
 
     fileprivate func tokenAtLocation(_ location: Int) -> TokenInformation? {
         for tokenInfo in tokenList {
@@ -604,7 +610,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let nsText = self.text as NSString
         selectedRange = NSRange(location: nsText.length, length: 0)
         _ = becomeFirstResponder()
-        delegate?.tokenTextViewDidChange(self)
+        delegate?.tokenTextViewControllerDidChange(self)
     }
 
     // MARK: Input Mode
@@ -621,7 +627,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         textView.autocorrectionType = .no
         textView.delegate = inputModeHandler
         textTappedHandler = inputModeTapHandler
-        delegate?.tokenTextViewDidChange(self)
+        delegate?.tokenTextViewControllerDidChange(self)
         tokenTextStorage.updateFormatting()
     }
 
@@ -659,6 +665,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if let charIndex = textView.characterIndexAtLocation(location), charIndex < textView.textStorage.length - 1 {
             var range = NSRange(location: 0, length: 0)
             if let tokenRef = textView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeName, at: charIndex, effectiveRange: &range) as? TokenReference {
+				let tokenInfo = tokenAtLocation(charIndex)!
 				// Token was selected
                 _ = resignFirstResponder()
                 let rect: CGRect = {
@@ -668,19 +675,22 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
                         return CGRect(origin: location, size: CGSize.zero)
                     }
                 }()
+				
 				if self.selectedToken == tokenRef {
 					// Token was tapped again; deselect it.
 					self.tokenTextStorage.selectedToken = nil
-					delegate?.tokenTextViewDidDeselectToken(self, tokenRef: tokenRef)
+					
+					delegate?.tokenTextViewController(self, didDeselectToken: tokenInfo)
 				} else {
 					tokenTextStorage.selectedToken = tokenRef
-					delegate?.tokenTextViewDidSelectToken(self, tokenRef: tokenRef, fromRect: rect)
+					delegate?.tokenTextViewController(self, didSelectToken: tokenInfo, inRect: rect)
 				}
 			} else {
 				if let selectedToken = self.selectedToken {
-					// Text was tapepd; deselect token
+					let tokenInfo = self.tokenInfo(for: selectedToken)
+					// Text was tapped; deselect token
 					tokenTextStorage.selectedToken = nil
-					delegate?.tokenTextViewDidDeselectToken(self, tokenRef: selectedToken)
+					delegate?.tokenTextViewController(self, didDeselectToken: tokenInfo)
 				}
 				self.textView.reloadInputViews()
 				// Set cursor at tap point
@@ -709,7 +719,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     // MARK: UITextViewDelegate
 
     open func textViewDidChange(_ textView: UITextView) {
-        self.delegate?.tokenTextViewDidChange(self)
+        self.delegate?.tokenTextViewControllerDidChange(self)
     }
 
     open func textViewDidChangeSelection(_ textView: UITextView) {
@@ -758,11 +768,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             let intersectingTokenReferences = tokenTextStorage.tokensIntersectingRange(range)
             if !intersectingTokenReferences.isEmpty {
                 replaceRangeAndIntersectingTokens(range, intersectingTokenReferences: intersectingTokenReferences, replacementText: replacementText)
-                self.delegate?.tokenTextViewDidChange(self)
+                self.delegate?.tokenTextViewControllerDidChange(self)
                 return false
             }
         }
-        return delegate?.tokenTextViewShouldChangeTextInRange(self, range: range, replacementText: replacementText) ?? true
+		return delegate?.tokenTextViewController(self, shouldChangeTextIn: range, replacementText: replacementText) ?? true
     }
 
     fileprivate func replaceRangeAndIntersectingTokens(_ range: NSRange, intersectingTokenReferences: [TokenReference], replacementText: String) {
@@ -775,7 +785,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         }
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         for tokenRef in intersectingTokenReferences {
-            delegate?.tokenTextViewDidDeleteToken(self, tokenRef: tokenRef)
+			let tokenInfo = self.tokenInfo(for: tokenRef)
+            delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
         }
     }
 
