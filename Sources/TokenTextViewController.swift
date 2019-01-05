@@ -478,7 +478,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         replaceTokenText(tokenRef, newText: "")
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         self.delegate?.tokenTextViewControllerDidChange(self)
-        delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
+		if let tokenInfo = tokenInfo {
+			delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
+		}
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
@@ -503,8 +505,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         return tokenTextStorage.tokenList
     }
 	
-	public func tokenInfo(for tokenRef: TokenReference) -> TokenInformation {
-		return tokenList.first { $0.reference == tokenRef }!
+	public func tokenInfo(for tokenRef: TokenReference) -> TokenInformation? {
+		return tokenList.first { $0.reference == tokenRef }
 	}
 	
 
@@ -686,8 +688,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 					delegate?.tokenTextViewController(self, didSelectToken: tokenInfo, inRect: rect)
 				}
 			} else {
-				if let selectedToken = self.selectedToken {
-					let tokenInfo = self.tokenInfo(for: selectedToken)
+				if let selectedToken = self.selectedToken,
+					let tokenInfo = self.tokenInfo(for: selectedToken) {
 					// Text was tapped; deselect token
 					tokenTextStorage.selectedToken = nil
 					delegate?.tokenTextViewController(self, didDeselectToken: tokenInfo)
@@ -785,8 +787,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         }
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         for tokenRef in intersectingTokenReferences {
-			let tokenInfo = self.tokenInfo(for: tokenRef)
-            delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
+			if let tokenInfo = self.tokenInfo(for: tokenRef) {
+				delegate?.tokenTextViewController(self, didDeleteToken: tokenInfo)
+			}
         }
     }
 
