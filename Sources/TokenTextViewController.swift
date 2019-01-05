@@ -26,38 +26,38 @@ public protocol TokenTextViewControllerDelegate: class {
     func tokenTextViewController(_ sender: TokenTextViewController, didAddToken tokenInfo: TokenInformation)
 
     /// Called when the formatting is being updated.
-    func tokenTextViewTextStorageIsUpdatingFormatting(_ sender: TokenTextViewController, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
+    func tokenTextViewController(_ sender: TokenTextViewController, textStorageIsUpdatingFormattingOn text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
 
     /// Allows display customization of a token.
-    func tokenDisplay(_ sender: TokenTextViewController, tokenRef: TokenReference) -> TokenDisplay?
+    func tokenDisplay(for sender: TokenTextViewController, tokenInfo: TokenInformation) -> TokenDisplay?
 
     /// Whether the last edit should cancel token editing.
-    func tokenTextViewShouldCancelEditingAtInsert(_ sender: TokenTextViewController, newText: String, inputText: String) -> Bool
+    func tokenTextViewController(_ sender: TokenTextViewController, shouldCancelEditingAfterInserting newText: String, inputText: String) -> Bool
 
     /// Whether content of type type can be pasted in the text view.
     /// This method is called every time some content may be pasted.
-    func tokenTextView(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool
+    func tokenTextViewController(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool
 
     /// Called when media items have been pasted.
-    func tokenTextView(_: TokenTextViewController, didReceive items: [PasteboardItem])
+    func tokenTextViewController(_: TokenTextViewController, didReceive items: [PasteboardItem])
 
 }
 
 /// Default implementation for some `TokenTextViewControllerDelegate` methods.
 public extension TokenTextViewControllerDelegate {
-
+	
     /// Default value of `false`.
-    func tokenTextView(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
+    func tokenTextViewController(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
         return false
     }
 
     /// Empty default implementation.
-    func tokenTextView(_: TokenTextViewController, didReceive items: [PasteboardItem]) {
+    func tokenTextViewController(_: TokenTextViewController, didReceive items: [PasteboardItem]) {
 
     }
 
     /// Empty default implementation
-    func tokenTextViewDidAddToken(_ sender: TokenTextViewController, tokenRef: TokenReference) {
+    func tokenTextViewController(_ sender: TokenTextViewController, didAddToken tokenInfo: TokenInformation) {
 
     }
 
@@ -449,7 +449,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeName] as! TokenReference
         let tokenInfo = TokenInformation(reference: tokenRef, text: effectiveText, range: tokenRange)
         delegate?.tokenTextViewControllerDidChange(self)
-        delegate?.tokenTextViewDidAddToken(self, tokenRef: tokenRef)
+        delegate?.tokenTextViewController(self, didAddToken: tokenInfo)
         return tokenInfo
     }
 
@@ -813,11 +813,14 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     // MARK: TokenTextViewTextStorageDelegate
 
     func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]? {
-        return delegate?.tokenTextViewTextStorageIsUpdatingFormatting(self, text: text, searchRange: searchRange)
+		return delegate?.tokenTextViewController(self, textStorageIsUpdatingFormattingOn: text, searchRange: searchRange)
     }
 	
 	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay? {
-		let tokenDisplay = delegate?.tokenDisplay(self, tokenRef: tokenRef) ?? TokenDisplay.defaultDisplay
+		guard let tokenInfo = self.tokenInfo(for: tokenRef),
+			let tokenDisplay = delegate?.tokenDisplay(for: self, tokenInfo: tokenInfo) else {
+				return TokenDisplay.defaultDisplay
+		}
 		return tokenDisplay
 	}
 
@@ -885,7 +888,7 @@ class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {
         tokenTextViewController.textView.selectedRange = NSRange(location: range.location + (newText as NSString).length, length: 0)
         if let (inputText, _) = tokenTextViewController.tokenTextStorage.inputTextAndRange() {
             tokenTextViewController.inputDelegate?.tokenTextViewInputTextDidChange(tokenTextViewController, inputText: inputText)
-            if let delegate = tokenTextViewController.delegate, delegate.tokenTextViewShouldCancelEditingAtInsert(tokenTextViewController, newText: newText, inputText: inputText) {
+            if let delegate = tokenTextViewController.delegate, delegate.tokenTextViewController(tokenTextViewController, shouldCancelEditingAfterInserting: newText, inputText: inputText) {
                 tokenTextViewController.cancelEditingAndKeepText()
             }
         }
@@ -941,11 +944,11 @@ extension UITextView {
 extension TokenTextViewController: PasteMediaTextViewPasteDelegate {
 
     func pasteMediaTextView(_: PasteMediaTextView, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
-        return delegate?.tokenTextView(self, shouldAcceptContentOfType: type) ?? false
+        return delegate?.tokenTextViewController(self, shouldAcceptContentOfType: type) ?? false
     }
 
     func pasteMediaTextView(_: PasteMediaTextView, didReceive items: [PasteboardItem]) {
-        delegate?.tokenTextView(self, didReceive: items)
+        delegate?.tokenTextViewController(self, didReceive: items)
     }
 
 }
