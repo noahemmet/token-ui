@@ -120,7 +120,7 @@ public struct TokenDisplay {
 public typealias TokenReference = String
 
 /// A data structure used to identify a `Token` inside some text.
-public struct Token {
+public struct Token: Equatable {
 
     /// The `Token` identifier.
     var reference: TokenReference
@@ -167,7 +167,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	/// A selected token
-	public var selectedToken: TokenReference? {
+	public var selectedToken: Token? {
 		return tokenTextStorage.selectedToken
 	}
 
@@ -494,8 +494,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
-        tokenTextStorage.enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
-            if tokenRef.reference == tokenToReplaceRef {
+        tokenTextStorage.enumerateTokens { (token, tokenRange) -> ObjCBool in
+            if token.reference == tokenToReplaceRef {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: newText)
                 return true
             }
@@ -675,8 +675,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let location: CGPoint = recognizer.location(in: textView)
         if let charIndex = textView.characterIndexAtLocation(location), charIndex < textView.textStorage.length - 1 {
             var range = NSRange(location: 0, length: 0)
-            if let tokenRef = textView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeReference, at: charIndex, effectiveRange: &range) as? TokenReference {
-				let tokenInfo = tokenAtLocation(charIndex)!
+			if let _ = textView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeReference, at: charIndex, effectiveRange: &range) as? TokenReference,
+				let token = tokenAtLocation(charIndex) {
 				// Token was selected
                 _ = resignFirstResponder()
                 let rect: CGRect = {
@@ -687,18 +687,17 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
                     }
                 }()
 				
-				if self.selectedToken == tokenRef {
+				if token == self.selectedToken {
 					// Token was tapped again; deselect it.
-					self.tokenTextStorage.selectedToken = nil
+					tokenTextStorage.selectedToken = nil
 					
-					delegate?.tokenTextViewController(self, didDeselectToken: tokenInfo)
+					delegate?.tokenTextViewController(self, didDeselectToken: token)
 				} else {
-					tokenTextStorage.selectedToken = tokenRef
-					delegate?.tokenTextViewController(self, didSelectToken: tokenInfo, inRect: rect)
+					tokenTextStorage.selectedToken = token
+					delegate?.tokenTextViewController(self, didSelectToken: token, inRect: rect)
 				}
 			} else {
-				if let selectedTokenRef = self.selectedToken,
-					let token = self.token(for: selectedTokenRef) {
+				if let token = self.selectedToken {
 					// Text was tapped; deselect token
 					tokenTextStorage.selectedToken = nil
 					delegate?.tokenTextViewController(self, didDeselectToken: token)

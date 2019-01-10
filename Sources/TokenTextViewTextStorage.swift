@@ -25,7 +25,7 @@ class TokenTextViewTextStorage: NSTextStorage {
     var textColor = Defaults.textColor
     weak var formattingDelegate: TokenTextViewTextStorageDelegate?
 	
-	var selectedToken: TokenReference?
+	var selectedToken: Token?
 	
     // MARK: Reading Text
 
@@ -199,8 +199,6 @@ class TokenTextViewTextStorage: NSTextStorage {
             in: searchRange,
             options: NSAttributedString.EnumerationOptions(rawValue: 0),
             using: { value, range, stop in
-				print(value)
-				print(range)
 				guard let tokenRef = value as? TokenReference,
 					let tokenID = self.attributes(at: range.location, effectiveRange: nil)[TokenTextViewControllerConstants.tokenAttributeID] as? String else {
 						return
