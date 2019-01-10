@@ -457,10 +457,10 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	@discardableResult
-	open func replaceToken(_ oldTokenRef: TokenReference, with newText: String, id: String) -> Token {
-		let selectedRange = self.selectedRange
-		self.deleteToken(oldTokenRef)
-		return self.addToken(selectedRange.location, text: newText, id: id)
+	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
+		let new = self.addToken(selectedRange.location, text: newText, id: id)
+		self.deleteToken(oldToken.reference)
+		return new
 	}
 
     /// Updates the formatting of the textView.
