@@ -94,9 +94,9 @@ class TokenTextViewTextStorage: NSTextStorage {
             addAttribute(.foregroundColor, value: linkColor, range: range)
         }
 
-        enumerateTokens(inRange: searchRange) { (tokenRef, tokenRange) -> ObjCBool in
+        enumerateTokens(inRange: searchRange) { (token, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
-			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: tokenRef) {
+			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.reference) {
                 tokenFormattingAttributes[.backgroundColor] = tokenDisplay.backgroundColor
 				tokenFormattingAttributes[.foregroundColor] = tokenDisplay.textColor
             }
@@ -153,27 +153,38 @@ class TokenTextViewTextStorage: NSTextStorage {
 
     // MARK: Token utilities
 
-    var tokenList: [TokenInformation] {
-        var tokenArray: [TokenInformation] = []
-        enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
-            let tokenText = self.attributedSubstring(from: tokenRange).string
-            let tokenInfo = TokenInformation(reference: tokenRef, text: tokenText, range: tokenRange)
-            tokenArray.append(tokenInfo)
+    var tokenList: [Token] {
+        var tokenArray: [Token] = []
+        enumerateTokens { (token, tokenRange) -> ObjCBool in
+            tokenArray.append(token)
             return false
         }
         return tokenArray
     }
 	
+	func token(for tokenRef: TokenReference) -> Token? {
+		var matchingToken: Token?
+		enumerateTokens { (token, tokenRange) -> ObjCBool in
+			if token.reference == tokenRef {
+				matchingToken = token
+				return true
+			}
+			return false
+		}
+		return matchingToken
+	}
+	
 	var segments: [TokenTextViewController.Segment] {
 		var segments: [TokenTextViewController.Segment] = []
 		enumerateAttributes(in: NSRange(location: 0, length: length), options: []) { (attributes, range, stop) in
 			let text = self.attributedSubstring(from: range).string
-			if let tokenRef = attributes[TokenTextViewControllerConstants.tokenAttributeName] as? TokenReference {
+			if let tokenRef = attributes[TokenTextViewControllerConstants.tokenAttributeReference] as? TokenReference {
 				guard text != " " else {
 					// We're prepending all tokens with a " " for some reason; let's ignore it til we can find out why.
 					return
 				}
-				let tokenInfo = TokenInformation(reference: tokenRef, text: text, range: range)
+				let tokenID = self.attribute(TokenTextViewControllerConstants.tokenAttributeID, at: range.location, effectiveRange: nil) as! String
+				let tokenInfo = Token(reference: tokenRef, id: tokenID, text: text, range: range)
 				segments.append(.token(tokenInfo))
 			} else {
 				segments.append(.text(text))
@@ -182,16 +193,22 @@ class TokenTextViewTextStorage: NSTextStorage {
 		return segments
 	}
 
-    func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ tokenRef: TokenReference, _ tokenRange: NSRange) -> ObjCBool) {
+    func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ token: Token, _ tokenRange: NSRange) -> ObjCBool) {
         let searchRange = range ?? NSRange(location: 0, length: length)
-        enumerateAttribute(TokenTextViewControllerConstants.tokenAttributeName,
+        enumerateAttribute(TokenTextViewControllerConstants.tokenAttributeReference,
             in: searchRange,
             options: NSAttributedString.EnumerationOptions(rawValue: 0),
             using: { value, range, stop in
-                if let tokenRef = value as? TokenReference {
-                    let shouldStop = action(tokenRef, range)
-                    stop.pointee = shouldStop
-                }
+				print(value)
+				print(range)
+				guard let tokenRef = value as? TokenReference,
+					let tokenID = self.attributes(at: range.location, effectiveRange: nil)[TokenTextViewControllerConstants.tokenAttributeID] as? String else {
+						return
+				}
+				let text = self.backingStore.attributedSubstring(from: range).string
+				let token = Token.init(reference: tokenRef, id: tokenID, text: text, range: range)
+				let shouldStop = action(token, range)
+				stop.pointee = shouldStop
         })
     }
 
