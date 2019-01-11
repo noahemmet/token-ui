@@ -102,14 +102,22 @@ class TokenTextViewTextStorage: NSTextStorage {
 			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font.bold()
             self.addAttributes(tokenFormattingAttributes, range: tokenRange)
 			
-			let spacing = tokenDisplay?.xInset ?? 3.0
-			
             // Add kerning to the leading and trailing space to prevent overlap
 			let leadingRange = NSRange(location: tokenRange.location - 1, length: 1)
 			var trailingRange = NSRange(location: tokenRange.location + tokenRange.length, length: 1)
-			if trailingRange.upperBound > searchRange.upperBound {
+			if trailingRange.upperBound > self.backingStore.string.count {
+				// next char is end of string.
 				trailingRange.location -= 1
+			} else {
+				// There is still yet string to come; if the next char after the token isn't a space
+				// (it might be a `.` or some such), we don't want the token background to overlap.
+//				let nextChar = self.backingStore.string[trailingRange.lowerBound]
+//				if nextChar != " " {
+//					trailingRange.location -= 1
+//				}
+				// We should just include the `.` as part of the token.
 			}
+			let spacing = tokenDisplay?.xInset ?? 3.0
             self.addAttributes([.kern: spacing], range: leadingRange)
             self.addAttributes([.kern: spacing], range: trailingRange)
             return false
