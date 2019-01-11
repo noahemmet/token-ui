@@ -102,12 +102,12 @@ public struct TokenDisplay {
 	public var textColor: UIColor
 	public var backgroundColor: UIColor
 	public var font: UIFont?
-	// These don't do anything yet.
 	public var xInset: CGFloat
 	public var yInset: CGFloat
+	// this doesn't do anything yet.
 	public var cornerRadius: CGFloat
 	
-	public init(textColor: UIColor, backgroundColor: UIColor, font: UIFont? = nil, xInset: CGFloat = -6, yInset: CGFloat = 1, cornerRadius: CGFloat = 20) {
+	public init(textColor: UIColor, backgroundColor: UIColor, font: UIFont? = nil, xInset: CGFloat = 6, yInset: CGFloat = 1, cornerRadius: CGFloat = 20) {
 		self.textColor = textColor
 		self.backgroundColor = backgroundColor
 		self.font = font
@@ -444,10 +444,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
 	open func addToken(_ startIndex: Int, text: String, id: String) -> Token {
-        let effectiveText = effectiveTokenDisplayText(text)
         var attrs = createNewTokenAttributes()
 		attrs[TokenTextViewControllerConstants.tokenAttributeID] = id
-        let attrString = NSAttributedString(string: effectiveText, attributes: attrs)
+        let attrString = NSAttributedString(string: text, attributes: attrs)
         textView.textStorage.insert(attrString, at: startIndex)
         repositionCursorAtEndOfRange()
         let token = tokenAtLocation(startIndex)!
@@ -459,8 +458,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 	@discardableResult
 	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
-		let new = self.addToken(selectedRange.location, text: newText, id: id)
 		self.deleteToken(oldToken.tokenID)
+		let new = self.addToken(selectedRange.location, text: newText, id: id)
 		if wasSelected {
 			// If the deleted token was selected, select the new one.
 			self.tokenTextStorage.selectedToken = new
@@ -475,14 +474,14 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     fileprivate func createNewTokenAttributes() -> [NSAttributedString.Key: Any] {
         return [
-            TokenTextViewControllerConstants.tokenAttributeReference: UUID().uuidString as TokenReference
+            TokenTextViewControllerConstants.tokenAttributeReference: UUID().uuidString,
+			
         ]
     }
 
     /// Updates the given `Token`'s text with the provided text and informs the delegate of the change.
     open func updateTokenText(_ tokenRef: TokenReference, newText: String) {
-        let effectiveText = effectiveTokenDisplayText(newText)
-        replaceTokenText(tokenRef, newText: effectiveText)
+        replaceTokenText(tokenRef, newText: newText)
         repositionCursorAtEndOfRange()
         self.delegate?.tokenTextViewControllerDidChange(self)
     }
@@ -837,13 +836,6 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		}
 		return tokenDisplay
 	}
-
-    // MARK: Token text management
-
-    fileprivate func effectiveTokenDisplayText(_ originalText: String) -> String {
-        return tokenTextStorage.effectiveTokenDisplayText(originalText)
-    }
-
 }
 
 class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {

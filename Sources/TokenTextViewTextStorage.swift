@@ -1,10 +1,10 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
 import Foundation
+import CommonUI
 import UIKit
 
 protocol TokenTextViewTextStorageDelegate: class {
-
     func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]?
 	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay?
 }
@@ -81,7 +81,7 @@ class TokenTextViewTextStorage: NSTextStorage {
     }
 
     fileprivate func applyFormattingAttributesToRange(_ searchRange: NSRange) {
-
+		
         // Set default attributes of edited range
         addAttribute(.foregroundColor, value: textColor, range: searchRange)
         addAttribute(.font, value: font, range: searchRange)
@@ -96,16 +96,22 @@ class TokenTextViewTextStorage: NSTextStorage {
 
         enumerateTokens(inRange: searchRange) { (token, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
-			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.tokenID) {
-                tokenFormattingAttributes[.backgroundColor] = tokenDisplay.backgroundColor
-				tokenFormattingAttributes[.foregroundColor] = tokenDisplay.textColor
-            }
-            let formattingRange = self.displayRangeFromTokenRange(tokenRange)
-            self.addAttributes(tokenFormattingAttributes, range: formattingRange)
-
+			let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.tokenID)
+			tokenFormattingAttributes[.backgroundColor] = tokenDisplay?.backgroundColor
+			tokenFormattingAttributes[.foregroundColor] = tokenDisplay?.textColor ?? self.textColor
+			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font.bold()
+            self.addAttributes(tokenFormattingAttributes, range: tokenRange)
+			
+			let spacing = tokenDisplay?.xInset ?? 3.0
+			
             // Add kerning to the leading and trailing space to prevent overlap
-            self.addAttributes([.kern: 3.0], range: NSRange(location: tokenRange.location, length: 1))
-            self.addAttributes([.kern: 3.0], range: NSRange(location: tokenRange.location + tokenRange.length - 1, length: 1))
+			let leadingRange = NSRange(location: tokenRange.location - 1, length: 1)
+			var trailingRange = NSRange(location: tokenRange.location + tokenRange.length, length: 1)
+			if trailingRange.upperBound > searchRange.upperBound {
+				trailingRange.location -= 1
+			}
+            self.addAttributes([.kern: spacing], range: leadingRange)
+            self.addAttributes([.kern: spacing], range: trailingRange)
             return false
         }
 
@@ -253,14 +259,6 @@ class TokenTextViewTextStorage: NSTextStorage {
             }
         }
         return true
-    }
-
-    func effectiveTokenDisplayText(_ originalText: String) -> String {
-        return " \(originalText) "
-    }
-
-    fileprivate func displayRangeFromTokenRange(_ tokenRange: NSRange) -> NSRange {
-        return NSRange(location: tokenRange.location + 1, length: tokenRange.length - 2)
     }
 
     // MARK: Input mode
