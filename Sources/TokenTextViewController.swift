@@ -122,11 +122,11 @@ public typealias TokenReference = String
 /// A data structure used to identify a `Token` inside some text.
 public struct Token: Equatable {
 
-    /// The `Token` identifier.
-    var reference: TokenReference
+    /// The id for the internal token storage.
+    public var tokenID: TokenReference
 	
-	/// The external key for tracking your token
-	public var id: String
+	/// The external key for tracking the id of the object associated with this token.
+	public var externalID: String
 	
     /// The text that contains the `Token`.
     public var text: String
@@ -458,8 +458,13 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 	
 	@discardableResult
 	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
+		let wasSelected: Bool = (oldToken == self.selectedToken)
 		let new = self.addToken(selectedRange.location, text: newText, id: id)
-		self.deleteToken(oldToken.reference)
+		self.deleteToken(oldToken.tokenID)
+		if wasSelected {
+			// If the deleted token was selected, select the new one.
+			self.tokenTextStorage.selectedToken = new
+		}
 		return new
 	}
 
@@ -491,18 +496,19 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		if let token = token {
 			delegate?.tokenTextViewController(self, didDeleteToken: token)
 		}
+		
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
         tokenTextStorage.enumerateTokens { (token, tokenRange) -> ObjCBool in
-            if token.reference == tokenToReplaceRef {
+            if token.tokenID == tokenToReplaceRef {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: newText)
                 return true
             }
             return false
         }
     }
-
+	
     fileprivate func repositionCursorAtEndOfRange() {
         let cursorLocation = textView.selectedRange.location
         if let tokenInfo = tokenAtLocation(cursorLocation) {
@@ -612,7 +618,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     public func makeTokenEditableAndMoveToFront(tokenReference: TokenReference) {
         var clickedTokenText = ""
 
-        guard let foundToken = tokenList.first(where: { $0.reference == tokenReference }) else { return }
+        guard let foundToken = tokenList.first(where: { $0.tokenID == tokenReference }) else { return }
         clickedTokenText = foundToken.text.trimmingCharacters(in: CharacterSet.whitespaces)
         tokenizeAllEditableText()
         deleteToken(tokenReference)
@@ -765,7 +771,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if range.length == 1 && (replacementText as NSString).length == 0 {
             // Deleting one character, if it is part of a token the full token should be deleted
             if let tokenInfo = tokenAtLocation(range.location) {
-                deleteToken(tokenInfo.reference)
+                deleteToken(tokenInfo.tokenID)
                 textView.selectedRange = NSRange(location: tokenInfo.range.location, length: 0)
                 return false
             }
@@ -788,7 +794,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     fileprivate func replaceRangeAndIntersectingTokens(_ range: NSRange, intersectingTokenReferences: [TokenReference], replacementText: String) {
         textView.textStorage.replaceCharacters(in: range, with: replacementText)
         tokenTextStorage.enumerateTokens { (token, tokenRange) -> ObjCBool in
-            if intersectingTokenReferences.contains(token.reference) {
+            if intersectingTokenReferences.contains(token.tokenID) {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: "")
             }
             return false

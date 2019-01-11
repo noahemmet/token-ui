@@ -96,7 +96,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 
         enumerateTokens(inRange: searchRange) { (token, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
-			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.reference) {
+			if let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.tokenID) {
                 tokenFormattingAttributes[.backgroundColor] = tokenDisplay.backgroundColor
 				tokenFormattingAttributes[.foregroundColor] = tokenDisplay.textColor
             }
@@ -165,7 +165,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 	func token(for tokenRef: TokenReference) -> Token? {
 		var matchingToken: Token?
 		enumerateTokens { (token, tokenRange) -> ObjCBool in
-			if token.reference == tokenRef {
+			if token.tokenID == tokenRef {
 				matchingToken = token
 				return true
 			}
@@ -184,7 +184,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 					return
 				}
 				let tokenID = self.attribute(TokenTextViewControllerConstants.tokenAttributeID, at: range.location, effectiveRange: nil) as! String
-				let tokenInfo = Token(reference: tokenRef, id: tokenID, text: text, range: range)
+				let tokenInfo = Token(tokenID: tokenRef, externalID: tokenID, text: text, range: range)
 				segments.append(.token(tokenInfo))
 			} else {
 				segments.append(.text(text))
@@ -204,7 +204,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 						return
 				}
 				let text = self.backingStore.attributedSubstring(from: range).string
-				let token = Token.init(reference: tokenRef, id: tokenID, text: text, range: range)
+				let token = Token.init(tokenID: tokenRef, externalID: tokenID, text: text, range: range)
 				let shouldStop = action(token, range)
 				stop.pointee = shouldStop
         })
@@ -214,7 +214,7 @@ class TokenTextViewTextStorage: NSTextStorage {
         return tokenList.filter {
             NSIntersectionRange(range, $0.range).length > 0
         }.map {
-            $0.reference
+            $0.tokenID
         }
     }
 
