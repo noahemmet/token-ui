@@ -460,6 +460,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		let wasSelected: Bool = (oldToken == self.selectedToken)
 		self.deleteToken(oldToken.tokenID)
 		let new = self.addToken(selectedRange.location, text: newText, id: id)
+//		self.replaceTokenText(oldToken.tokenID, newText: newText)
 		if wasSelected {
 			// If the deleted token was selected, select the new one.
 			self.tokenTextStorage.selectedToken = new

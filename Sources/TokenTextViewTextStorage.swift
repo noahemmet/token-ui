@@ -99,7 +99,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 			let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.tokenID)
 			tokenFormattingAttributes[.backgroundColor] = tokenDisplay?.backgroundColor
 			tokenFormattingAttributes[.foregroundColor] = tokenDisplay?.textColor ?? self.textColor
-			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font.bold()
+			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font
             self.addAttributes(tokenFormattingAttributes, range: tokenRange)
 			
             // Add kerning to the leading and trailing space to prevent overlap
@@ -111,10 +111,10 @@ class TokenTextViewTextStorage: NSTextStorage {
 			} else {
 				// There is still yet string to come; if the next char after the token isn't a space
 				// (it might be a `.` or some such), we don't want the token background to overlap.
-//				let nextChar = self.backingStore.string[trailingRange.lowerBound]
-//				if nextChar != " " {
-//					trailingRange.location -= 1
-//				}
+				let nextChar = self.backingStore.string[trailingRange.lowerBound]
+				if nextChar != " " {
+					trailingRange.location -= 1
+				}
 				// We should just include the `.` as part of the token.
 			}
 			let spacing = tokenDisplay?.xInset ?? 3.0
