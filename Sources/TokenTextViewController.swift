@@ -6,40 +6,40 @@ import UIKit
 
 /// The delegate used to handle user interaction and enable/disable customization to a `TokenTextViewController`.
 public protocol TokenTextViewControllerDelegate: class {
-
+	
     /// Called when text changes.
-    func tokenTextViewControllerDidChange(_ sender: TokenTextViewController)
+    func tokenTextViewControllerDidChange(_ sender: TokenTextViewController<Any>)
 
     /// Whether an edit should be accepted.
-    func tokenTextViewController(_ sender: TokenTextViewController, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
 
 	/// Called when a token was tapped.
-	func tokenTextViewController(_ sender: TokenTextViewController, didSelectToken token: Token, inRect rect: CGRect)
+	func tokenTextViewController(_ sender: TokenTextViewController<Any>, didSelectToken token: Token<Any>, inRect rect: CGRect)
 	
 	/// Called when a token was de-selected.
-	func tokenTextViewController(_ sender: TokenTextViewController, didDeselectToken token: Token)
+	func tokenTextViewController(_ sender: TokenTextViewController<Any>, didDeselectToken token: Token<Any>)
 
     /// Called when a token was deleted.
-    func tokenTextViewController(_ sender: TokenTextViewController, didDeleteToken token: Token)
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, didDeleteToken token: Token<Any>)
 
     /// Called when a token was added.
-    func tokenTextViewController(_ sender: TokenTextViewController, didAddToken token: Token)
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, didAddToken token: Token<Any>)
 
     /// Called when the formatting is being updated.
-    func tokenTextViewController(_ sender: TokenTextViewController, textStorageIsUpdatingFormattingOn text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, textStorageIsUpdatingFormattingOn text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]
 
     /// Allows display customization of a token.
-    func tokenDisplay(for sender: TokenTextViewController, token: Token) -> TokenDisplay?
+    func tokenDisplay(for sender: TokenTextViewController<Any>, token: Token<Any>) -> TokenDisplay?
 
     /// Whether the last edit should cancel token editing.
-    func tokenTextViewController(_ sender: TokenTextViewController, shouldCancelEditingAfterInserting newText: String, inputText: String) -> Bool
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, shouldCancelEditingAfterInserting newText: String, inputText: String) -> Bool
 
     /// Whether content of type type can be pasted in the text view.
     /// This method is called every time some content may be pasted.
-    func tokenTextViewController(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool
+    func tokenTextViewController(_: TokenTextViewController<Any>, shouldAcceptContentOfType type: PasteboardItemType) -> Bool
 
     /// Called when media items have been pasted.
-    func tokenTextViewController(_: TokenTextViewController, didReceive items: [PasteboardItem])
+    func tokenTextViewController(_: TokenTextViewController<Any>, didReceive items: [PasteboardItem])
 
 }
 
@@ -47,17 +47,17 @@ public protocol TokenTextViewControllerDelegate: class {
 public extension TokenTextViewControllerDelegate {
 	
     /// Default value of `false`.
-    func tokenTextViewController(_: TokenTextViewController, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
+    func tokenTextViewController(_: TokenTextViewController<Any>, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
         return false
     }
 
     /// Empty default implementation.
-    func tokenTextViewController(_: TokenTextViewController, didReceive items: [PasteboardItem]) {
+    func tokenTextViewController(_: TokenTextViewController<Any>, didReceive items: [PasteboardItem]) {
 
     }
 
     /// Empty default implementation
-    func tokenTextViewController(_ sender: TokenTextViewController, didAddToken token: Token) {
+    func tokenTextViewController(_ sender: TokenTextViewController<Any>, didAddToken token: Token<Any>) {
 
     }
 
@@ -67,13 +67,13 @@ public extension TokenTextViewControllerDelegate {
 public protocol TokenTextViewControllerInputDelegate: class {
 
     /// Called whenever the text is updated.
-    func tokenTextViewInputTextDidChange(_ sender: TokenTextViewController, inputText: String)
+    func tokenTextViewInputTextDidChange(_ sender: TokenTextViewController<Any>, inputText: String)
 
     /// Called when the text is confirmed by the user.
-    func tokenTextViewInputTextWasConfirmed(_ sender: TokenTextViewController)
+    func tokenTextViewInputTextWasConfirmed(_ sender: TokenTextViewController<Any>)
 
     /// Called when teh text is cancelled by the user.
-    func tokenTextViewInputTextWasCanceled(_ sender: TokenTextViewController, reason: TokenTextInputCancellationReason)
+    func tokenTextViewInputTextWasCanceled(_ sender: TokenTextViewController<Any>, reason: TokenTextInputCancellationReason)
 
 }
 
@@ -120,7 +120,7 @@ public struct TokenDisplay {
 public typealias TokenReference = String
 
 /// A data structure used to identify a `Token` inside some text.
-public struct Token: Equatable {
+public struct Token<MetaData>: Equatable {
 
     /// The id for the internal token storage.
     public var tokenID: TokenReference
@@ -137,14 +137,14 @@ public struct Token: Equatable {
 }
 
 extension TokenTextViewController {
-	public enum Segment {
+	public enum Segment<MetaData> {
 		case text(String)
-		case token(Token)
+		case token(Token<MetaData>)
 	}
 }
 
 /// Used to display a `UITextView` that creates and responds to `Token`'s as the user types and taps.
-open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayoutManagerDelegate, TokenTextViewTextStorageDelegate, UIGestureRecognizerDelegate {
+open class TokenTextViewController<MetaData>: UIViewController, UITextViewDelegate, NSLayoutManagerDelegate, TokenTextViewTextStorageDelegate, UIGestureRecognizerDelegate {
 
     /// The delegate used to handle user interaction and enable/disable customization.
     open weak var delegate: TokenTextViewControllerDelegate?
@@ -153,7 +153,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     open weak var inputDelegate: TokenTextViewControllerInputDelegate? {
         didSet {
             if let (inputText, _) = tokenTextStorage.inputTextAndRange() {
-                inputDelegate?.tokenTextViewInputTextDidChange(self, inputText: inputText)
+				inputDelegate?.tokenTextViewInputTextDidChange(self as! TokenTextViewController<Any>, inputText: inputText)
             }
         }
     }
@@ -167,7 +167,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	/// A selected token
-	public var selectedToken: Token? {
+	public var selectedToken: Token<MetaData>? {
 		return tokenTextStorage.selectedToken
 	}
 
@@ -175,7 +175,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     public var tokenizeOnLostFocus = false
 
     fileprivate var tokenTapRecognizer: UITapGestureRecognizer?
-    fileprivate var inputModeHandler: TokenTextViewControllerInputModeHandler!
+    fileprivate var inputModeHandler: TokenTextViewControllerInputModeHandler<MetaData>!
     fileprivate var textTappedHandler: ((UITapGestureRecognizer) -> Void)?
     fileprivate var inputIsSuspended = false
 
@@ -204,7 +204,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Loads a `PasteMediaTextView` as the base view of `self`.
     override open func loadView() {
-        let textStorage = TokenTextViewTextStorage()
+        let textStorage = TokenTextViewTextStorage<MetaData>()
         textStorage.formattingDelegate = self
         let layoutManager = TokenTextViewLayoutManager()
         layoutManager.delegate = self
@@ -227,11 +227,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         return (view as! TextView)
     }
 	
-	public var segments: [Segment] {
-		return tokenTextStorage.segments
+	public var segments: [Segment<MetaData>] {
+		return tokenTextStorage.segments as! [TokenTextViewController<MetaData>.Segment]
 	}
 
-    fileprivate var tokenTextStorage: TokenTextViewTextStorage {
+    fileprivate var tokenTextStorage: TokenTextViewTextStorage<MetaData> {
         return textView.textStorage as! TokenTextViewTextStorage
     }
 
@@ -443,20 +443,20 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
-	open func addToken(_ startIndex: Int, text: String, id: String) -> Token {
+	open func addToken(_ startIndex: Int, text: String, id: String) -> Token<MetaData> {
         var attrs = createNewTokenAttributes()
 		attrs[TokenTextViewControllerConstants.tokenAttributeID] = id
         let attrString = NSAttributedString(string: text, attributes: attrs)
         textView.textStorage.insert(attrString, at: startIndex)
         repositionCursorAtEndOfRange()
         let token = tokenAtLocation(startIndex)!
-        delegate?.tokenTextViewControllerDidChange(self)
-        delegate?.tokenTextViewController(self, didAddToken: token)
+		delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
+		delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didAddToken: token as! Token<Any>)
         return token
     }
 	
 	@discardableResult
-	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
+	open func replaceToken(_ oldToken: Token<MetaData>, with newText: String, id: String) -> Token<MetaData> {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
 		self.deleteToken(oldToken.tokenID)
 		let new = self.addToken(selectedRange.location, text: newText, id: id)
@@ -484,7 +484,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     open func updateTokenText(_ tokenRef: TokenReference, newText: String) {
         replaceTokenText(tokenRef, newText: newText)
         repositionCursorAtEndOfRange()
-        self.delegate?.tokenTextViewControllerDidChange(self)
+		self.delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
     }
 
     /// Delegates the given `Token` and informs the delegate of the change.
@@ -492,9 +492,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		let token = self.token(for: tokenRef)
         replaceTokenText(tokenRef, newText: "")
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
-        self.delegate?.tokenTextViewControllerDidChange(self)
+		self.delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
 		if let token = token {
-			delegate?.tokenTextViewController(self, didDeleteToken: token)
+			delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didDeleteToken: token as! Token<Any>)
 		}
 		
     }
@@ -517,15 +517,15 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 
     /// An array of all the `Token`'s currently in the textView.
-    open var tokenList: [Token] {
+    open var tokenList: [Token<MetaData>] {
         return tokenTextStorage.tokenList
     }
 	
-	public func token(for tokenRef: TokenReference) -> Token? {
+	public func token(for tokenRef: TokenReference) -> Token<MetaData>? {
 		return tokenTextStorage.token(for: tokenRef)
 	}
 
-    fileprivate func tokenAtLocation(_ location: Int) -> Token? {
+    fileprivate func tokenAtLocation(_ location: Int) -> Token<MetaData>? {
         for token in tokenList {
             if location >= token.range.location && location < token.range.location + token.range.length {
                 return token
@@ -546,7 +546,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     fileprivate func cancelEditingAndKeepText() {
         tokenTextStorage.clearEditingAttributes()
-        inputDelegate?.tokenTextViewInputTextWasCanceled(self, reason: .tapOut)
+		inputDelegate?.tokenTextViewInputTextWasCanceled(self as! TokenTextViewController<Any>, reason: .tapOut)
     }
 
     // MARK: Token List editing
@@ -627,7 +627,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let nsText = self.text as NSString
         selectedRange = NSRange(location: nsText.length, length: 0)
         _ = becomeFirstResponder()
-        delegate?.tokenTextViewControllerDidChange(self)
+		delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
     }
 
     // MARK: Input Mode
@@ -644,7 +644,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         textView.autocorrectionType = .no
         textView.delegate = inputModeHandler
         textTappedHandler = inputModeTapHandler
-        delegate?.tokenTextViewControllerDidChange(self)
+		delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
         tokenTextStorage.updateFormatting()
     }
 
@@ -697,16 +697,16 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 					// Token was tapped again; deselect it.
 					tokenTextStorage.selectedToken = nil
 					
-					delegate?.tokenTextViewController(self, didDeselectToken: token)
+					delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didDeselectToken: token as! Token<Any>)
 				} else {
 					tokenTextStorage.selectedToken = token
-					delegate?.tokenTextViewController(self, didSelectToken: token, inRect: rect)
+					delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didSelectToken: token as! Token<Any>, inRect: rect)
 				}
 			} else {
 				if let token = self.selectedToken {
 					// Text was tapped; deselect token
 					tokenTextStorage.selectedToken = nil
-					delegate?.tokenTextViewController(self, didDeselectToken: token)
+					delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didDeselectToken: token as! Token<Any>)
 				}
 				self.textView.reloadInputViews()
 				// Set cursor at tap point
@@ -735,7 +735,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     // MARK: UITextViewDelegate
 
     open func textViewDidChange(_ textView: UITextView) {
-        self.delegate?.tokenTextViewControllerDidChange(self)
+		self.delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
     }
 
     open func textViewDidChangeSelection(_ textView: UITextView) {
@@ -784,11 +784,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             let intersectingTokenReferences = tokenTextStorage.tokensIntersectingRange(range)
             if !intersectingTokenReferences.isEmpty {
                 replaceRangeAndIntersectingTokens(range, intersectingTokenReferences: intersectingTokenReferences, replacementText: replacementText)
-                self.delegate?.tokenTextViewControllerDidChange(self)
+				self.delegate?.tokenTextViewControllerDidChange(self as! TokenTextViewController<Any>)
                 return false
             }
         }
-		return delegate?.tokenTextViewController(self, shouldChangeTextIn: range, replacementText: replacementText) ?? true
+		return delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, shouldChangeTextIn: range, replacementText: replacementText) ?? true
     }
 
     fileprivate func replaceRangeAndIntersectingTokens(_ range: NSRange, intersectingTokenReferences: [TokenReference], replacementText: String) {
@@ -802,7 +802,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         for tokenRef in intersectingTokenReferences {
 			if let token = self.token(for: tokenRef) {
-				delegate?.tokenTextViewController(self, didDeleteToken: token)
+				delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didDeleteToken: token as! Token<Any>)
 			}
         }
     }
@@ -826,24 +826,24 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     // MARK: TokenTextViewTextStorageDelegate
 
-    func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]? {
-		return delegate?.tokenTextViewController(self, textStorageIsUpdatingFormattingOn: text, searchRange: searchRange)
+	func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage<Any>, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]? {
+		return delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, textStorageIsUpdatingFormattingOn: text, searchRange: searchRange)
     }
 	
-	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay? {
+	func tokenDisplay(_ sender: TokenTextViewTextStorage<Any>, tokenRef: TokenReference) -> TokenDisplay? {
 		guard let token = self.token(for: tokenRef),
-			let tokenDisplay = delegate?.tokenDisplay(for: self, token: token) else {
+			let tokenDisplay = delegate?.tokenDisplay(for: self as! TokenTextViewController<Any>, token: token as! Token<Any>) else {
 				return TokenDisplay.defaultDisplay
 		}
 		return tokenDisplay
 	}
 }
 
-class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {
+class TokenTextViewControllerInputModeHandler<MetaData>: NSObject, UITextViewDelegate {
 
-    fileprivate weak var tokenTextViewController: TokenTextViewController!
+    fileprivate weak var tokenTextViewController: TokenTextViewController<MetaData>!
 
-    init(tokenTextViewController: TokenTextViewController) {
+    init(tokenTextViewController: TokenTextViewController<MetaData>) {
         self.tokenTextViewController = tokenTextViewController
     }
 
@@ -886,7 +886,7 @@ class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {
     fileprivate func handleInsertion(_ range: NSRange, newText: String) {
         if newText == "\n" {
             // Do not insert return, inform delegate
-            tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasConfirmed(tokenTextViewController)
+			tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasConfirmed(tokenTextViewController as! TokenTextViewController<Any>)
             return
         }
         // Insert new text with token attribute
@@ -894,8 +894,8 @@ class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {
         tokenTextViewController.textView.textStorage.insert(attrString, at: range.location)
         tokenTextViewController.textView.selectedRange = NSRange(location: range.location + (newText as NSString).length, length: 0)
         if let (inputText, _) = tokenTextViewController.tokenTextStorage.inputTextAndRange() {
-            tokenTextViewController.inputDelegate?.tokenTextViewInputTextDidChange(tokenTextViewController, inputText: inputText)
-            if let delegate = tokenTextViewController.delegate, delegate.tokenTextViewController(tokenTextViewController, shouldCancelEditingAfterInserting: newText, inputText: inputText) {
+			tokenTextViewController.inputDelegate?.tokenTextViewInputTextDidChange(tokenTextViewController as! TokenTextViewController<Any>, inputText: inputText)
+			if let delegate = tokenTextViewController.delegate, delegate.tokenTextViewController(tokenTextViewController as! TokenTextViewController<Any>, shouldCancelEditingAfterInserting: newText, inputText: inputText) {
                 tokenTextViewController.cancelEditingAndKeepText()
             }
         }
@@ -905,18 +905,18 @@ class TokenTextViewControllerInputModeHandler: NSObject, UITextViewDelegate {
         if let (_, inputRange) = tokenTextViewController.tokenTextStorage.inputTextAndRange(), let (_, anchorRange) = tokenTextViewController.tokenTextStorage.anchorTextAndRange() {
             if range.location >= anchorRange.location && range.location < anchorRange.location + anchorRange.length {
                 // The anchor ("@") is deleted, input is cancelled
-                tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasCanceled(tokenTextViewController, reason: .deleteInput)
+				tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasCanceled(tokenTextViewController as! TokenTextViewController<Any>, reason: .deleteInput)
             } else if range.location >= inputRange.location && range.location < inputRange.location + inputRange.length {
                 // Do deletion
                 tokenTextViewController.textView.textStorage.replaceCharacters(in: range, with: "")
                 tokenTextViewController.textView.selectedRange = NSRange(location: range.location, length: 0)
                 if let (inputText, _) = tokenTextViewController.tokenTextStorage.inputTextAndRange() {
-                    tokenTextViewController.inputDelegate?.tokenTextViewInputTextDidChange(tokenTextViewController, inputText: inputText)
+					tokenTextViewController.inputDelegate?.tokenTextViewInputTextDidChange(tokenTextViewController as! TokenTextViewController<Any>, inputText: inputText)
                 }
             }
         } else {
             // Input fully deleted, input is cancelled
-            tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasCanceled(tokenTextViewController, reason: .deleteInput)
+			tokenTextViewController.inputDelegate?.tokenTextViewInputTextWasCanceled(tokenTextViewController as! TokenTextViewController<Any>, reason: .deleteInput)
         }
     }
 
@@ -951,11 +951,11 @@ extension UITextView {
 extension TokenTextViewController: PasteMediaTextViewPasteDelegate {
 
     func pasteMediaTextView(_: PasteMediaTextView, shouldAcceptContentOfType type: PasteboardItemType) -> Bool {
-        return delegate?.tokenTextViewController(self, shouldAcceptContentOfType: type) ?? false
+		return delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, shouldAcceptContentOfType: type) ?? false
     }
 
     func pasteMediaTextView(_: PasteMediaTextView, didReceive items: [PasteboardItem]) {
-        delegate?.tokenTextViewController(self, didReceive: items)
+		delegate?.tokenTextViewController(self as! TokenTextViewController<Any>, didReceive: items)
     }
 
 }

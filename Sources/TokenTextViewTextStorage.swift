@@ -5,27 +5,21 @@ import CommonUI
 import UIKit
 
 protocol TokenTextViewTextStorageDelegate: class {
-    func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]?
-	func tokenDisplay(_ sender: TokenTextViewTextStorage, tokenRef: TokenReference) -> TokenDisplay?
+	func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage<Any>, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]?
+	func tokenDisplay(_ sender: TokenTextViewTextStorage<Any>, tokenRef: TokenReference) -> TokenDisplay?
 }
 
-class TokenTextViewTextStorage: NSTextStorage {
-
-    private struct Defaults {
-        static let font = UIFont.preferredFont(forTextStyle: .body)
-        static let linkColor = UIColor(red: 0.0, green: 174.0/255.0, blue: 239.0/255.0, alpha: 1.0)
-        static let textColor = UIColor(white: 36.0/255.0, alpha: 1.0)
-    }
+class TokenTextViewTextStorage<MetaData>: NSTextStorage {
 
     fileprivate let backingStore = NSMutableAttributedString()
     fileprivate var dynamicTextNeedsUpdate = false
 
-    var font = Defaults.font
-    var linkColor = Defaults.linkColor
-    var textColor = Defaults.textColor
+    var font = UIFont.preferredFont(forTextStyle: .body)
+    var linkColor = UIColor(red: 0.0, green: 174.0/255.0, blue: 239.0/255.0, alpha: 1.0)
+    var textColor = UIColor(white: 36.0/255.0, alpha: 1.0)
     weak var formattingDelegate: TokenTextViewTextStorageDelegate?
 	
-	var selectedToken: Token?
+	var selectedToken: Token<MetaData>?
 	
     // MARK: Reading Text
 
@@ -96,7 +90,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 
         enumerateTokens(inRange: searchRange) { (token, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
-			let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: token.tokenID)
+			let tokenDisplay = self.formattingDelegate?.tokenDisplay(self as! TokenTextViewTextStorage<Any>, tokenRef: token.tokenID)
 			tokenFormattingAttributes[.backgroundColor] = tokenDisplay?.backgroundColor
 			tokenFormattingAttributes[.foregroundColor] = tokenDisplay?.textColor ?? self.textColor
 			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font
@@ -123,7 +117,7 @@ class TokenTextViewTextStorage: NSTextStorage {
             return false
         }
 
-        if let additionalFormats = formattingDelegate?.textStorageIsUpdatingFormatting(self, text: backingStore.string, searchRange: searchRange), !additionalFormats.isEmpty {
+		if let additionalFormats = formattingDelegate?.textStorageIsUpdatingFormatting(self as! TokenTextViewTextStorage<Any>, text: backingStore.string, searchRange: searchRange), !additionalFormats.isEmpty {
             for (formatDict, range) in additionalFormats {
                 if !rangeIntersectsToken(range) {
                     addAttributes(formatDict, range: range)
@@ -167,8 +161,8 @@ class TokenTextViewTextStorage: NSTextStorage {
 
     // MARK: Token utilities
 
-    var tokenList: [Token] {
-        var tokenArray: [Token] = []
+    var tokenList: [Token<MetaData>] {
+        var tokenArray: [Token<MetaData>] = []
         enumerateTokens { (token, tokenRange) -> ObjCBool in
             tokenArray.append(token)
             return false
@@ -176,8 +170,8 @@ class TokenTextViewTextStorage: NSTextStorage {
         return tokenArray
     }
 	
-	func token(for tokenRef: TokenReference) -> Token? {
-		var matchingToken: Token?
+	func token(for tokenRef: TokenReference) -> Token<MetaData>? {
+		var matchingToken: Token<MetaData>?
 		enumerateTokens { (token, tokenRange) -> ObjCBool in
 			if token.tokenID == tokenRef {
 				matchingToken = token
@@ -188,8 +182,8 @@ class TokenTextViewTextStorage: NSTextStorage {
 		return matchingToken
 	}
 	
-	var segments: [TokenTextViewController.Segment] {
-		var segments: [TokenTextViewController.Segment] = []
+	var segments: [TokenTextViewController<Any>.Segment<MetaData>] {
+		var segments: [TokenTextViewController<MetaData>.Segment<MetaData>] = []
 		enumerateAttributes(in: NSRange(location: 0, length: length), options: []) { (attributes, range, stop) in
 			let text = self.attributedSubstring(from: range).string
 			if let tokenRef = attributes[TokenTextViewControllerConstants.tokenAttributeReference] as? TokenReference {
@@ -204,10 +198,10 @@ class TokenTextViewTextStorage: NSTextStorage {
 				segments.append(.text(text))
 			}
 		}
-		return segments
+		return segments as! [TokenTextViewController<Any>.Segment]
 	}
 
-    func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ token: Token, _ tokenRange: NSRange) -> ObjCBool) {
+    func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ token: Token<MetaData>, _ tokenRange: NSRange) -> ObjCBool) {
         let searchRange = range ?? NSRange(location: 0, length: length)
         enumerateAttribute(TokenTextViewControllerConstants.tokenAttributeReference,
             in: searchRange,
