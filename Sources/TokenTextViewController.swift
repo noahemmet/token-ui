@@ -88,8 +88,8 @@ public enum TokenTextInputCancellationReason {
 /// A data structure to hold constants for the `TokenTextViewController`.
 public struct TokenTextViewControllerConstants {
 
-    public static let tokenAttributeReference = NSAttributedString.Key(rawValue: "com.hootsuite.tokenReference")
-	public static let tokenAttributeID = NSAttributedString.Key(rawValue: "com.hootsuite.tokenID")
+    public static let tokenAttributeReference = NSAttributedString.Key(rawValue: "com.hootsuite.tokenID")
+	public static let externalID = NSAttributedString.Key(rawValue: "com.hootsuite.externalID")
     static let inputTextAttributeName = NSAttributedString.Key(rawValue: "com.hootsuite.input")
     static let inputTextAttributeAnchorValue = "anchor"
     static let inputTextAttributeTextValue = "text"
@@ -445,7 +445,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     @discardableResult
 	open func addToken(_ startIndex: Int, text: String, id: String) -> Token {
         var attrs = createNewTokenAttributes()
-		attrs[TokenTextViewControllerConstants.tokenAttributeID] = id
+		attrs[TokenTextViewControllerConstants.externalID] = id
+		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
+		tokenTextStorage.externalTokenIDsByReference[tokenRef] = id
         let attrString = NSAttributedString(string: text, attributes: attrs)
         textView.textStorage.insert(attrString, at: startIndex)
         repositionCursorAtEndOfRange()
@@ -489,19 +491,17 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Delegates the given `Token` and informs the delegate of the change.
     open func deleteToken(_ tokenRef: TokenReference) {
-		let token = self.token(for: tokenRef)
+		let token = self.token(for: tokenRef)!
+		tokenTextStorage.externalTokenIDsByReference[token.tokenID] = nil
         replaceTokenText(tokenRef, newText: "")
-        textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
+        textView.selectedRange = NSRange(location: textView.selectedRange.location-token.text.count, length: 0)
         self.delegate?.tokenTextViewControllerDidChange(self)
-		if let token = token {
-			delegate?.tokenTextViewController(self, didDeleteToken: token)
-		}
-		
+		delegate?.tokenTextViewController(self, didDeleteToken: token)
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
-        tokenTextStorage.enumerateTokens { (token, tokenRange) -> ObjCBool in
-            if token.tokenID == tokenToReplaceRef {
+        tokenTextStorage.enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+            if tokenRef == tokenToReplaceRef {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: newText)
                 return true
             }
@@ -793,8 +793,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     fileprivate func replaceRangeAndIntersectingTokens(_ range: NSRange, intersectingTokenReferences: [TokenReference], replacementText: String) {
         textView.textStorage.replaceCharacters(in: range, with: replacementText)
-        tokenTextStorage.enumerateTokens { (token, tokenRange) -> ObjCBool in
-            if intersectingTokenReferences.contains(token.tokenID) {
+        tokenTextStorage.enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+            if intersectingTokenReferences.contains(tokenRef) {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: "")
             }
             return false
