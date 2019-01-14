@@ -500,7 +500,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 
     fileprivate func replaceTokenText(_ tokenToReplaceRef: TokenReference, newText: String) {
-        tokenTextStorage.enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+        tokenTextStorage.enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
             if tokenRef == tokenToReplaceRef {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: newText)
                 return true
@@ -793,7 +793,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     fileprivate func replaceRangeAndIntersectingTokens(_ range: NSRange, intersectingTokenReferences: [TokenReference], replacementText: String) {
         textView.textStorage.replaceCharacters(in: range, with: replacementText)
-        tokenTextStorage.enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+        tokenTextStorage.enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
             if intersectingTokenReferences.contains(tokenRef) {
                 self.textView.textStorage.replaceCharacters(in: tokenRange, with: "")
             }

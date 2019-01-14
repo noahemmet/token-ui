@@ -94,7 +94,7 @@ class TokenTextViewTextStorage: NSTextStorage {
             addAttribute(.foregroundColor, value: linkColor, range: range)
         }
 
-        enumerateTokens(inRange: searchRange) { (tokenRef, tokenRange) -> ObjCBool in
+        enumerateTokenRefs(inRange: searchRange) { (tokenRef, tokenRange) -> ObjCBool in
             var tokenFormattingAttributes = [NSAttributedString.Key: Any]()
 			let tokenDisplay = self.formattingDelegate?.tokenDisplay(self, tokenRef: tokenRef)
 			tokenFormattingAttributes[.backgroundColor] = tokenDisplay?.backgroundColor
@@ -171,7 +171,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 	
     var tokenList: [Token] {
         var tokenArray: [Token] = []
-        enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+        enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
 			let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
 			let tokenText = self.attributedSubstring(from: tokenRange).string
 			let token = Token(tokenRef: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
@@ -183,7 +183,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 	
 	func token(for matchingTokenRef: TokenReference) -> Token? {
 		var matchingToken: Token?
-		enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
+		enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
 			if tokenRef == matchingTokenRef {
 				let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
 				let tokenText = self.attributedSubstring(from: tokenRange).string
@@ -215,19 +215,15 @@ class TokenTextViewTextStorage: NSTextStorage {
 		return segments
 	}
 
-    func enumerateTokens(inRange range: NSRange? = nil, withAction action:@escaping (_ tokenRef: TokenReference, _ tokenRange: NSRange) -> ObjCBool) {
+    func enumerateTokenRefs(inRange range: NSRange? = nil, withAction action:@escaping (_ tokenRef: TokenReference, _ tokenRange: NSRange) -> ObjCBool) {
         let searchRange = range ?? NSRange(location: 0, length: length)
         enumerateAttribute(TokenTextViewControllerConstants.tokenAttributeReference,
             in: searchRange,
             options: NSAttributedString.EnumerationOptions(rawValue: 0),
             using: { value, range, stop in
-				guard let tokenRef = value as? TokenReference
-//					let tokenID = self.attributes(at: range.location, effectiveRange: nil)[TokenTextViewControllerConstants.tokenAttributeID] as? String
-				else {
+				guard let tokenRef = value as? TokenReference else {
 						return
 				}
-//				let text = self.backingStore.attributedSubstring(from: range).string
-//				let token = Token.init(tokenID: tokenRef, externalID: tokenID, text: text, range: range)
 				let shouldStop = action(tokenRef, range)
 				stop.pointee = shouldStop
         })
