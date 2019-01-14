@@ -262,10 +262,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Enables/disables some gestures to be recognized simultaneously.
     open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer == tokenTapRecognizer {
-            return true
-        }
-        return false
+		return false
     }
 
     // MARK: UITextView variables and functions.

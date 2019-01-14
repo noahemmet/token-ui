@@ -118,7 +118,9 @@ class TokenTextViewTextStorage: NSTextStorage {
 				// We should just include the `.` as part of the token.
 			}
 			let spacing = tokenDisplay?.xInset ?? 3.0
-            self.addAttributes([.kern: spacing], range: leadingRange)
+			if leadingRange.location >= 0 {
+				self.addAttributes([.kern: spacing], range: leadingRange)
+			}
             self.addAttributes([.kern: spacing], range: trailingRange)
             return false
         }
