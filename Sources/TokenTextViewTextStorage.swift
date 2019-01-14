@@ -113,9 +113,8 @@ class TokenTextViewTextStorage: NSTextStorage {
 				// (it might be a `.` or some such), we don't want the token background to overlap.
 				let nextChar = self.backingStore.string[trailingRange.lowerBound]
 				if nextChar != " " {
-					trailingRange.location -= 1
 				}
-				// We should just include the `.` as part of the token.
+				trailingRange.location -= 1
 			}
 			let spacing = tokenDisplay?.xInset ?? 3.0
 			if leadingRange.location >= 0 {

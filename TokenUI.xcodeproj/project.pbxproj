@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		864A57F721DECBC000C40306 /* CommonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 864A57F521DEC9FD00C40306 /* CommonUI.framework */; };
 		86860C9D21E9576A009AA757 /* Common.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86860C9C21E9576A009AA757 /* Common.framework */; };
+		86BCC0E221EC7D5800A54F06 /* CommonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86BCC0E121EC7D5800A54F06 /* CommonUI.framework */; };
 		A8AC40921DA5D8CE00D644CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8AC40841DA5D8C500D644CA /* LaunchScreen.storyboard */; };
 		A8AC40931DA5D8CE00D644CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8AC40861DA5D8C500D644CA /* Main.storyboard */; };
 		A8AC40941DA5D8D900D644CA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A8AC40831DA5D8C500D644CA /* Assets.xcassets */; };
@@ -59,8 +59,8 @@
 
 /* Begin PBXFileReference section */
 		67B914721F96C1B500ECB28E /* TokenUIDemo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = TokenUIDemo.gif; sourceTree = "<group>"; };
-		864A57F521DEC9FD00C40306 /* CommonUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CommonUI.framework; path = ../Carthage/Build/iOS/CommonUI.framework; sourceTree = "<group>"; };
 		86860C9C21E9576A009AA757 /* Common.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Common.framework; path = ../Carthage/Build/iOS/Common.framework; sourceTree = "<group>"; };
+		86BCC0E121EC7D5800A54F06 /* CommonUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CommonUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AC40831DA5D8C500D644CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A8AC40851DA5D8C500D644CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A8AC40871DA5D8C500D644CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -87,7 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				864A57F721DECBC000C40306 /* CommonUI.framework in Frameworks */,
+				86BCC0E221EC7D5800A54F06 /* CommonUI.framework in Frameworks */,
 				86860C9D21E9576A009AA757 /* Common.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -114,8 +114,8 @@
 		864A57F121DEC71500C40306 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				86BCC0E121EC7D5800A54F06 /* CommonUI.framework */,
 				86860C9C21E9576A009AA757 /* Common.framework */,
-				864A57F521DEC9FD00C40306 /* CommonUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -362,14 +362,12 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/../Carthage/Build/iOS/CommonUI.framework",
 				"${SRCROOT}/../Carthage/Build/iOS/Common.framework",
 			);
 			name = Carthage;
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/CommonUI.framework",
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Common.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
