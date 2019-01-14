@@ -123,7 +123,7 @@ public typealias TokenReference = String
 public struct Token: Equatable {
 
     /// The id for the internal token storage.
-    public var tokenID: TokenReference
+    var tokenRef: TokenReference
 	
 	/// The external key for tracking the id of the object associated with this token.
 	public var externalID: String
@@ -460,7 +460,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 	@discardableResult
 	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
-		self.deleteToken(oldToken.tokenID)
+		self.deleteToken(oldToken.tokenRef)
 		let new = self.addToken(selectedRange.location, text: newText, id: id)
 //		self.replaceTokenText(oldToken.tokenID, newText: newText)
 		if wasSelected {
@@ -492,7 +492,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     /// Delegates the given `Token` and informs the delegate of the change.
     open func deleteToken(_ tokenRef: TokenReference) {
 		let token = self.token(for: tokenRef)!
-		tokenTextStorage.externalTokenIDsByReference[token.tokenID] = nil
+		tokenTextStorage.externalTokenIDsByReference[token.tokenRef] = nil
         replaceTokenText(tokenRef, newText: "")
         textView.selectedRange = NSRange(location: textView.selectedRange.location-token.text.count, length: 0)
         self.delegate?.tokenTextViewControllerDidChange(self)
@@ -618,7 +618,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     public func makeTokenEditableAndMoveToFront(tokenReference: TokenReference) {
         var clickedTokenText = ""
 
-        guard let foundToken = tokenList.first(where: { $0.tokenID == tokenReference }) else { return }
+        guard let foundToken = tokenList.first(where: { $0.tokenRef == tokenReference }) else { return }
         clickedTokenText = foundToken.text.trimmingCharacters(in: CharacterSet.whitespaces)
         tokenizeAllEditableText()
         deleteToken(tokenReference)
@@ -771,7 +771,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if range.length == 1 && (replacementText as NSString).length == 0 {
             // Deleting one character, if it is part of a token the full token should be deleted
             if let tokenInfo = tokenAtLocation(range.location) {
-                deleteToken(tokenInfo.tokenID)
+                deleteToken(tokenInfo.tokenRef)
                 textView.selectedRange = NSRange(location: tokenInfo.range.location, length: 0)
                 return false
             }

@@ -174,7 +174,7 @@ class TokenTextViewTextStorage: NSTextStorage {
         enumerateTokens { (tokenRef, tokenRange) -> ObjCBool in
 			let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
 			let tokenText = self.attributedSubstring(from: tokenRange).string
-			let token = Token(tokenID: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
+			let token = Token(tokenRef: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
             tokenArray.append(token)
             return false
         }
@@ -187,7 +187,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 			if tokenRef == matchingTokenRef {
 				let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
 				let tokenText = self.attributedSubstring(from: tokenRange).string
-				let token = Token.init(tokenID: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
+				let token = Token(tokenRef: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
 				matchingToken = token
 				return true
 			}
@@ -206,7 +206,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 					return
 				}
 				let externalID = self.attribute(TokenTextViewControllerConstants.externalID, at: range.location, effectiveRange: nil) as! String
-				let tokenInfo = Token(tokenID: tokenRef, externalID: externalID, text: text, range: range)
+				let tokenInfo = Token(tokenRef: tokenRef, externalID: externalID, text: text, range: range)
 				segments.append(.token(tokenInfo))
 			} else {
 				segments.append(.text(text))
@@ -237,7 +237,7 @@ class TokenTextViewTextStorage: NSTextStorage {
         return tokenList.filter {
             NSIntersectionRange(range, $0.range).length > 0
         }.map {
-            $0.tokenID
+            $0.tokenRef
         }
     }
 
