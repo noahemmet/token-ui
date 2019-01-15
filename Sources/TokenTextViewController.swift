@@ -457,9 +457,16 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 	@discardableResult
 	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
+		print("wasSelected: \(wasSelected)")
+		print("oldRef: \(oldToken.tokenRef)")
+		print("oldTextCount: \(oldToken.text.count)")
+		print("oldRange: \(selectedRange.location)")
 		self.deleteToken(oldToken.tokenRef)
+		print("newRange: \(selectedRange.location)")
 		let new = self.addToken(selectedRange.location, text: newText, id: id)
-//		self.replaceTokenText(oldToken.tokenID, newText: newText)
+		print("newerRange: \(selectedRange.location)")
+		self.replaceTokenText(oldToken.tokenRef, newText: newText)
+		print("newestRange: \(selectedRange.location)")
 		if wasSelected {
 			// If the deleted token was selected, select the new one.
 			self.tokenTextStorage.selectedToken = new
@@ -491,7 +498,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		let token = self.token(for: tokenRef)!
 		tokenTextStorage.externalTokenIDsByReference[token.tokenRef] = nil
         replaceTokenText(tokenRef, newText: "")
-        textView.selectedRange = NSRange(location: textView.selectedRange.location-token.text.count, length: 0)
+        textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         self.delegate?.tokenTextViewControllerDidChange(self)
 		delegate?.tokenTextViewController(self, didDeleteToken: token)
     }
