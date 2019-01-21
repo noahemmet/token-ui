@@ -301,7 +301,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 
     /// The selected range of text in the textView.
-    open var selectedRange: NSRange {
+    open var range: NSRange {
         get {
             return textView.selectedRange
         }
@@ -457,16 +457,10 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 	@discardableResult
 	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
-		print("wasSelected: \(wasSelected)")
-		print("oldRef: \(oldToken.tokenRef)")
-		print("oldTextCount: \(oldToken.text.count)")
-		print("oldRange: \(selectedRange.location)")
+		let range: NSRange = selectedToken?.range ?? textView.selectedRange
 		self.deleteToken(oldToken.tokenRef)
-		print("newRange: \(selectedRange.location)")
-		let new = self.addToken(selectedRange.location, text: newText, id: id)
-		print("newerRange: \(selectedRange.location)")
+		let new = self.addToken(range.location, text: newText, id: id)
 		self.replaceTokenText(oldToken.tokenRef, newText: newText)
-		print("newestRange: \(selectedRange.location)")
 		if wasSelected {
 			// If the deleted token was selected, select the new one.
 			self.tokenTextStorage.selectedToken = new
@@ -614,7 +608,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
         // move cursor to the end
         nsText = text as NSString
-        selectedRange = NSRange(location: nsText.length, length: 0)
+        range = NSRange(location: nsText.length, length: 0)
     }
 
     // Create editable text from exisitng token, appended to end of input field
@@ -629,7 +623,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         appendText(clickedTokenText)
 
         let nsText = self.text as NSString
-        selectedRange = NSRange(location: nsText.length, length: 0)
+        range = NSRange(location: nsText.length, length: 0)
         _ = becomeFirstResponder()
         delegate?.tokenTextViewControllerDidChange(self)
     }
@@ -654,7 +648,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Sets the text tap handler with the `normalModeTapHandler` and returns the location of the cursor.
     open func switchToNormalEditingMode() -> Int {
-        var location = selectedRange.location
+        var location = range.location
         if let (_, anchorRange) = tokenTextStorage.anchorTextAndRange() {
             location = anchorRange.location
             replaceCharactersInRange(anchorRange, withString: "")
