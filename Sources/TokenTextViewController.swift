@@ -710,7 +710,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 				// Set cursor at tap point
 				self.textView.selectedRange = NSRange(location: charIndex, length: 0)
 			}
-        }
+		} else {
+			// Tapped past end of textview; set cursor at very end
+			self.textView.reloadInputViews()
+			self.textView.selectedRange = NSRange(location: textView.textStorage.length, length: 0)
+		}
     }
 
     fileprivate func inputModeTap(recognizer: UITapGestureRecognizer) {
