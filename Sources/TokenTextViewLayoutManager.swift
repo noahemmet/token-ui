@@ -9,7 +9,7 @@ class TokenTextViewLayoutManager: NSLayoutManager {
         // FIXME: check attributes
         for i in 0..<rectCount {
 			// This prevents the token ui from overlapping with the previous character.
-            let backgroundRect = rectArray[i].inset(by: UIEdgeInsets(top: 2, left: -6, bottom: 2, right: 0))
+            let backgroundRect = rectArray[i].inset(by: UIEdgeInsets(top: 2, left: 0, bottom: 2, right: 0))
             let path = UIBezierPath(roundedRect: backgroundRect, cornerRadius: 20)
             path.fill()
             path.stroke()

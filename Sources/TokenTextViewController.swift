@@ -445,7 +445,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 		attrs[TokenTextViewControllerConstants.externalID] = id
 		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
 		tokenTextStorage.externalTokenIDsByReference[tokenRef] = id
-        let attrString = NSAttributedString(string: text, attributes: attrs)
+        let attrString = NSAttributedString(string: tokenTextStorage.effectiveTokenDisplayText(text), attributes: attrs)
         textView.textStorage.insert(attrString, at: startIndex)
         repositionCursorAtEndOfRange()
         let token = tokenAtLocation(startIndex)!
@@ -482,7 +482,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Updates the given `Token`'s text with the provided text and informs the delegate of the change.
     open func updateTokenText(_ tokenRef: TokenReference, newText: String) {
-        replaceTokenText(tokenRef, newText: newText)
+        replaceTokenText(tokenRef, newText: tokenTextStorage.effectiveTokenDisplayText(newText))
         repositionCursorAtEndOfRange()
         self.delegate?.tokenTextViewControllerDidChange(self)
     }

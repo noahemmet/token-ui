@@ -101,26 +101,6 @@ class TokenTextViewTextStorage: NSTextStorage {
 			tokenFormattingAttributes[.foregroundColor] = tokenDisplay?.textColor ?? self.textColor
 			tokenFormattingAttributes[.font] = tokenDisplay?.font ?? self.font
             self.addAttributes(tokenFormattingAttributes, range: tokenRange)
-			
-            // Add kerning to the leading and trailing space to prevent overlap
-			let leadingRange = NSRange(location: tokenRange.location - 1, length: 1)
-			var trailingRange = NSRange(location: tokenRange.location + tokenRange.length, length: 1)
-			if trailingRange.upperBound > self.backingStore.string.count {
-				// next char is end of string.
-				trailingRange.location -= 1
-			} else {
-				// There is still yet string to come; if the next char after the token isn't a space
-				// (it might be a `.` or some such), we don't want the token background to overlap.
-				let nextChar = self.backingStore.string[trailingRange.lowerBound]
-				if nextChar != " " {
-				}
-				trailingRange.location -= 1
-			}
-			let spacing = tokenDisplay?.xInset ?? 3.0
-			if leadingRange.location >= 0 {
-				self.addAttributes([.kern: spacing], range: leadingRange)
-			}
-            self.addAttributes([.kern: spacing], range: trailingRange)
             return false
         }
 
@@ -223,7 +203,7 @@ class TokenTextViewTextStorage: NSTextStorage {
             options: NSAttributedString.EnumerationOptions(rawValue: 0),
             using: { value, range, stop in
 				guard let tokenRef = value as? TokenReference else {
-						return
+					return
 				}
 				let shouldStop = action(tokenRef, range)
 				stop.pointee = shouldStop
@@ -274,7 +254,12 @@ class TokenTextViewTextStorage: NSTextStorage {
         }
         return true
     }
-
+	
+	/// Adds padding around the token.
+	func effectiveTokenDisplayText(_ originalText: String) -> String {
+		return " \(originalText) "
+	}
+	
     // MARK: Input mode
 
     func anchorTextAndRange() -> (String, NSRange)? {
