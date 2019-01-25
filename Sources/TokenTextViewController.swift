@@ -709,6 +709,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 				self.textView.reloadInputViews()
 				// Set cursor at tap point
 				self.textView.selectedRange = NSRange(location: charIndex, length: 0)
+				self.textView.becomeFirstResponder()
 			}
 		} else {
 			// Tapped past end of textview; set cursor at very end
