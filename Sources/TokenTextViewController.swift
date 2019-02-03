@@ -511,7 +511,9 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         let cursorLocation = textView.selectedRange.location
         if let tokenInfo = tokenAtLocation(cursorLocation) {
             textView.selectedRange = NSRange(location: tokenInfo.range.location + tokenInfo.range.length, length: 0)
-        }
+		} else {
+			textView.selectedRange = NSRange(location: text.count, length: 0)
+		}
     }
 
     /// An array of all the `Token`'s currently in the textView.
