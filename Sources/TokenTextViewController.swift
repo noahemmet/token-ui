@@ -512,6 +512,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if let tokenInfo = tokenAtLocation(cursorLocation) {
             textView.selectedRange = NSRange(location: tokenInfo.range.location + tokenInfo.range.length, length: 0)
 		} else {
+			// This might not be desirable for prepending text…
 			textView.selectedRange = NSRange(location: text.count, length: 0)
 		}
     }
