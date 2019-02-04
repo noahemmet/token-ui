@@ -456,7 +456,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
-	open func addToken(_ startIndex: Int, text: String, id: Int?) -> Token {
+	open func addToken(_ startIndex: Int, text: String, id: Int) -> Token {
         var attrs = createNewTokenAttributes()
 		attrs[TokenTextViewControllerConstants.externalID] = id
 		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
