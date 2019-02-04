@@ -693,36 +693,45 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             self?.inputModeTap(recognizer: recognizer)
         }
     }
+	
+	func token(at location: CGPoint) -> Token? {
+		var range = NSRange(location: 0, length: 0)
+		guard let charIndex = textView.characterIndexAtLocation(location), charIndex < textView.textStorage.length - 1,
+			let _ = textView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeReference, at: charIndex, effectiveRange: &range) as? TokenReference,
+			let token = tokenAtLocation(charIndex) else {
+				return nil
+		}
+		return token
+	}
 
     fileprivate func normalModeTap(recognizer: UITapGestureRecognizer) {
-        textView.becomeFirstResponder()
-        let location: CGPoint = recognizer.location(in: textView)
-        if let charIndex = textView.characterIndexAtLocation(location), charIndex < textView.textStorage.length - 1 {
-            var range = NSRange(location: 0, length: 0)
-			if let _ = textView.attributedText?.attribute(TokenTextViewControllerConstants.tokenAttributeReference, at: charIndex, effectiveRange: &range) as? TokenReference,
-				let token = tokenAtLocation(charIndex) {
-				// Token was selected
-                _ = resignFirstResponder()
-                let rect: CGRect = {
-                    if let textRange = textView.textRangeFromNSRange(range) {
-                        return view.convert(textView.firstRect(for: textRange), from: textView.textInputView)
-                    } else {
-                        return CGRect(origin: location, size: CGSize.zero)
-                    }
-                }()
-				
-				if token == self.selectedToken {
-					// Token was tapped again; deselect it.
-					tokenTextStorage.selectedToken = nil
-					
-					delegate?.tokenTextViewController(self, didDeselectToken: token)
+		textView.becomeFirstResponder()
+		let location: CGPoint = recognizer.location(in: textView)
+		if let token = self.token(at: location) {
+			// Token was selected
+			_ = resignFirstResponder()
+			let rect: CGRect = {
+				if let textRange = textView.textRangeFromNSRange(range) {
+					return view.convert(textView.firstRect(for: textRange), from: textView.textInputView)
 				} else {
-					tokenTextStorage.selectedToken = token
-					delegate?.tokenTextViewController(self, didSelectToken: token, inRect: rect)
+					return CGRect(origin: location, size: CGSize.zero)
 				}
+			}()
+			
+			if token == self.selectedToken {
+				// Token was tapped again; deselect it.
+				tokenTextStorage.selectedToken = nil
+				
+				delegate?.tokenTextViewController(self, didDeselectToken: token)
 			} else {
+				tokenTextStorage.selectedToken = token
+				delegate?.tokenTextViewController(self, didSelectToken: token, inRect: rect)
+			}
+		} else {
+			if let charIndex = textView.characterIndexAtLocation(location) {
+				// Text was tapped;
 				if let token = self.selectedToken {
-					// Text was tapped; deselect token
+					// deselect token if one was selected
 					tokenTextStorage.selectedToken = nil
 					delegate?.tokenTextViewController(self, didDeselectToken: token)
 				}
@@ -730,13 +739,13 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 				// Set cursor at tap point
 				self.textView.selectedRange = NSRange(location: charIndex, length: 0)
 				self.textView.becomeFirstResponder()
+			} else {
+				// Tapped past end of textview; set cursor at very end
+				self.textView.reloadInputViews()
+				self.textView.selectedRange = NSRange(location: textView.textStorage.length, length: 0)
 			}
-		} else {
-			// Tapped past end of textview; set cursor at very end
-			self.textView.reloadInputViews()
-			self.textView.selectedRange = NSRange(location: textView.textStorage.length, length: 0)
 		}
-    }
+	}
 
     fileprivate func inputModeTap(recognizer: UITapGestureRecognizer) {
         guard !inputIsSuspended else {
