@@ -126,7 +126,7 @@ public struct Token: Equatable {
     var tokenRef: TokenReference
 	
 	/// The external key for tracking the id of the object associated with this token.
-	public var externalID: String
+	public var externalID: Int
 	
     /// The text that contains the `Token`.
     public var text: String
@@ -140,6 +140,22 @@ extension TokenTextViewController {
 	public enum Segment {
 		case text(String)
 		case token(Token)
+		
+		public var asText: String? {
+			if case .text(let text) = self {
+				return text
+			} else {
+				return nil
+			}
+		}
+		
+		public var asToken: Token? {
+			if case .token(let token) = self {
+				return token
+			} else {
+				return nil
+			}
+		}
 	}
 }
 
@@ -440,7 +456,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
-	open func addToken(_ startIndex: Int, text: String, id: String) -> Token {
+	open func addToken(_ startIndex: Int, text: String, id: Int?) -> Token {
         var attrs = createNewTokenAttributes()
 		attrs[TokenTextViewControllerConstants.externalID] = id
 		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
@@ -455,7 +471,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	@discardableResult
-	open func replaceToken(_ oldToken: Token, with newText: String, id: String) -> Token {
+	open func replaceToken(_ oldToken: Token, with newText: String, id: Int) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
 		let range: NSRange = selectedToken?.range ?? textView.selectedRange
 		self.deleteToken(oldToken.tokenRef)
@@ -559,7 +575,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             replaceCharactersInRange(range, withString: "")
             let textSubstring = nsText.substring(with: range).trimmingCharacters(in: .whitespaces)
             if !textSubstring.isEmpty {
-				addToken(range.location, text: textSubstring, id: textSubstring)
+				fatalError()
+				addToken(range.location, text: textSubstring, id: -1)
             }
         }
     }

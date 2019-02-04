@@ -148,7 +148,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 
     // MARK: Token utilities
 	
-	var externalTokenIDsByReference: [TokenReference: String] = [:]
+	var externalTokenIDsByReference: [TokenReference: Int] = [:]
 	
     var tokenList: [Token] {
         var tokenArray: [Token] = []
@@ -186,7 +186,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 					// We're prepending all tokens with a " " for some reason; let's ignore it til we can find out why.
 					return
 				}
-				let externalID = self.attribute(TokenTextViewControllerConstants.externalID, at: range.location, effectiveRange: nil) as! String
+				let externalID = self.attribute(TokenTextViewControllerConstants.externalID, at: range.location, effectiveRange: nil) as! Int
 				let tokenInfo = Token(tokenRef: tokenRef, externalID: externalID, text: text, range: range)
 				segments.append(.token(tokenInfo))
 			} else {
