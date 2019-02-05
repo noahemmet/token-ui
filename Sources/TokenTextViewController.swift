@@ -232,6 +232,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         textView.delegate = self
         textView.mediaPasteDelegate = self
         textView.isScrollEnabled = true
+		textView.font = font
         tokenTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(TokenTextViewController.textTapped(_:)))
         tokenTapRecognizer!.numberOfTapsRequired = 1
         tokenTapRecognizer!.delegate = self
@@ -253,7 +254,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        textView.font = font
+		
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(TokenTextViewController.preferredContentSizeChanged(_:)),
