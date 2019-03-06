@@ -7,6 +7,12 @@ import UIKit
 /// The delegate used to handle user interaction and enable/disable customization to a `TokenTextViewController`.
 public protocol TokenTextViewControllerDelegate: class {
 
+	/// Called when the textview begins editing.
+	func tokenTextViewControllerDidBeginEditing(_ sender: TokenTextViewController)
+	
+	/// Called when the textview ends editing.
+	func tokenTextViewControllerDidEndEditing(_ sender: TokenTextViewController)
+	
     /// Called when text changes.
     func tokenTextViewControllerDidChange(_ sender: TokenTextViewController)
 
@@ -766,6 +772,10 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 
     // MARK: UITextViewDelegate
+	
+	open func textViewDidBeginEditing(_ textView: UITextView) {
+		self.delegate?.tokenTextViewControllerDidBeginEditing(self)
+	}
 
     open func textViewDidChange(_ textView: UITextView) {
         self.delegate?.tokenTextViewControllerDidChange(self)
@@ -844,6 +854,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
         if tokenizeOnLostFocus {
             tokenizeAllEditableText()
         }
+		delegate?.tokenTextViewControllerDidEndEditing(self)
     }
 
 
