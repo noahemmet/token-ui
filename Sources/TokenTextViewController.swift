@@ -1,8 +1,9 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
 import Foundation
-import CommonUI
 import UIKit
+import CommonUI
+import Common
 
 /// The delegate used to handle user interaction and enable/disable customization to a `TokenTextViewController`.
 public protocol TokenTextViewControllerDelegate: class {
@@ -132,7 +133,7 @@ public struct Token: Equatable {
     var tokenRef: TokenReference
 	
 	/// The external key for tracking the id of the object associated with this token.
-	public var externalID: Int
+	public var key: Key
 	
     /// The text that contains the `Token`.
     public var text: String
@@ -463,11 +464,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
-	open func addToken(_ startIndex: Int, text: String, id: Int) -> Token {
+	open func addToken(_ startIndex: Int, text: String, key: Key) -> Token {
         var attrs = createNewTokenAttributes()
-		attrs[TokenTextViewControllerConstants.externalID] = id
+		attrs[TokenTextViewControllerConstants.externalID] = key
 		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
-		tokenTextStorage.externalTokenIDsByReference[tokenRef] = id
+		tokenTextStorage.keysByTokenReference[tokenRef] = key
         let attrString = NSAttributedString(string: tokenTextStorage.effectiveTokenDisplayText(text), attributes: attrs)
         textView.textStorage.insert(attrString, at: startIndex)
         repositionCursorAtEndOfRange()
@@ -478,11 +479,11 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	@discardableResult
-	open func replaceToken(_ oldToken: Token, with newText: String, id: Int) -> Token {
+	open func replaceToken(_ oldToken: Token, with newText: String, key: Key) -> Token {
 		let wasSelected: Bool = (oldToken == self.selectedToken)
 		let range: NSRange = selectedToken?.range ?? textView.selectedRange
 		self.deleteToken(oldToken.tokenRef)
-		let new = self.addToken(range.location, text: newText, id: id)
+		let new = self.addToken(range.location, text: newText, key: key)
 		self.replaceTokenText(oldToken.tokenRef, newText: newText)
 		if wasSelected {
 			// If the deleted token was selected, select the new one.
@@ -513,7 +514,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     /// Delegates the given `Token` and informs the delegate of the change.
     open func deleteToken(_ tokenRef: TokenReference) {
 		let token = self.token(for: tokenRef)!
-		tokenTextStorage.externalTokenIDsByReference[token.tokenRef] = nil
+		tokenTextStorage.keysByTokenReference[token.tokenRef] = nil
         replaceTokenText(tokenRef, newText: "")
         textView.selectedRange = NSRange(location: textView.selectedRange.location, length: 0)
         self.delegate?.tokenTextViewControllerDidChange(self)
@@ -583,7 +584,7 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
             let textSubstring = nsText.substring(with: range).trimmingCharacters(in: .whitespaces)
             if !textSubstring.isEmpty {
 				fatalError()
-				addToken(range.location, text: textSubstring, id: -1)
+				addToken(range.location, text: textSubstring, key: "")
             }
         }
     }

@@ -1,8 +1,9 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
 import Foundation
-import CommonUI
 import UIKit
+import CommonUI
+import Common
 
 protocol TokenTextViewTextStorageDelegate: class {
     func textStorageIsUpdatingFormatting(_ sender: TokenTextViewTextStorage, text: String, searchRange: NSRange) -> [(attributes: [NSAttributedString.Key: Any], forRange: NSRange)]?
@@ -148,14 +149,14 @@ class TokenTextViewTextStorage: NSTextStorage {
 
     // MARK: Token utilities
 	
-	var externalTokenIDsByReference: [TokenReference: Int] = [:]
+	var keysByTokenReference: [TokenReference: Common.Key] = [:]
 	
     var tokenList: [Token] {
         var tokenArray: [Token] = []
         enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
-			let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
+			let key = self.keysByTokenReference[tokenRef]!
 			let tokenText = self.attributedSubstring(from: tokenRange).string
-			let token = Token(tokenRef: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
+			let token = Token(tokenRef: tokenRef, key: key, text: tokenText, range: tokenRange)
             tokenArray.append(token)
             return false
         }
@@ -166,9 +167,9 @@ class TokenTextViewTextStorage: NSTextStorage {
 		var matchingToken: Token?
 		enumerateTokenRefs { (tokenRef, tokenRange) -> ObjCBool in
 			if tokenRef == matchingTokenRef {
-				let externalTokenID = self.externalTokenIDsByReference[tokenRef]!
+				let key = self.keysByTokenReference[tokenRef]!
 				let tokenText = self.attributedSubstring(from: tokenRange).string
-				let token = Token(tokenRef: tokenRef, externalID: externalTokenID, text: tokenText, range: tokenRange)
+				let token = Token(tokenRef: tokenRef, key: key, text: tokenText, range: tokenRange)
 				matchingToken = token
 				return true
 			}
@@ -186,8 +187,8 @@ class TokenTextViewTextStorage: NSTextStorage {
 					// We're prepending all tokens with a " " for some reason; let's ignore it til we can find out why.
 					return
 				}
-				let externalID = self.attribute(TokenTextViewControllerConstants.externalID, at: range.location, effectiveRange: nil) as! Int
-				let tokenInfo = Token(tokenRef: tokenRef, externalID: externalID, text: text, range: range)
+				let key = self.attribute(TokenTextViewControllerConstants.externalID, at: range.location, effectiveRange: nil) as! Common.Key
+				let tokenInfo = Token(tokenRef: tokenRef, key: key, text: text, range: range)
 				segments.append(.token(tokenInfo))
 			} else {
 				segments.append(.text(text))
