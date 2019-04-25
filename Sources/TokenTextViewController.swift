@@ -130,7 +130,7 @@ public typealias TokenReference = String
 public struct Token: Equatable {
 
     /// The id for the internal token storage.
-    var tokenRef: TokenReference
+    public var tokenRef: TokenReference
 	
 	/// The external key for tracking the id of the object associated with this token.
 	public var key: Key
