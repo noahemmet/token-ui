@@ -227,7 +227,6 @@
 				A8C860991DA5B1EF00F4B309 /* Resources */,
 				A81982F61DB003030086BAB1 /* Set version number */,
 				A8B7678C1E5B9D0C006A2670 /* Run SwiftLint */,
-				864A57F421DEC76300C40306 /* Carthage */,
 			);
 			buildRules = (
 			);
@@ -355,26 +354,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		864A57F421DEC76300C40306 /* Carthage */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${SRCROOT}/../Carthage/Build/iOS/Common.framework",
-			);
-			name = Carthage;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Common.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# https://github.com/Carthage/Carthage#if-youre-building-for-ios-tvos-or-watchos\n/usr/local/bin/carthage copy-frameworks\n";
-		};
 		A81982F61DB003030086BAB1 /* Set version number */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
