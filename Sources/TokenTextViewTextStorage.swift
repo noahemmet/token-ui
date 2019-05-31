@@ -16,6 +16,7 @@ class TokenTextViewTextStorage: NSTextStorage {
         static let font = UIFont.preferredFont(forTextStyle: .body)
         static let linkColor = UIColor(red: 0.0, green: 174.0/255.0, blue: 239.0/255.0, alpha: 1.0)
         static let textColor = UIColor(white: 36.0/255.0, alpha: 1.0)
+		static let textBackgroundColor = UIColor.white
     }
 
     fileprivate let backingStore = NSMutableAttributedString()
@@ -23,7 +24,8 @@ class TokenTextViewTextStorage: NSTextStorage {
 
     var font = Defaults.font
     var linkColor = Defaults.linkColor
-    var textColor = Defaults.textColor
+	var textColor = Defaults.textColor
+	var textBackgroundColor = Defaults.textBackgroundColor
     weak var formattingDelegate: TokenTextViewTextStorageDelegate?
 	
 	var selectedToken: Token?
@@ -85,6 +87,7 @@ class TokenTextViewTextStorage: NSTextStorage {
 		
         // Set default attributes of edited range
         addAttribute(.foregroundColor, value: textColor, range: searchRange)
+		addAttribute(.backgroundColor, value: textBackgroundColor, range: searchRange)
         addAttribute(.font, value: font, range: searchRange)
         addAttribute(.kern, value: 0.0, range: searchRange)
 
