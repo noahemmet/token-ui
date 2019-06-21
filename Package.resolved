@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Common",
+        "repositoryURL": "https://github.com/noahemmet/Common",
+        "state": {
+          "branch": "spm",
+          "revision": "098be1c04f56aab829277649db6372b93477c60b",
+          "version": null
+        }
+      },
+      {
+        "package": "CommonUI",
+        "repositoryURL": "https://github.com/noahemmet/CommonUI",
+        "state": {
+          "branch": "spm",
+          "revision": "c30191b6efcb07a249d9771233218c4a789fc053",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
