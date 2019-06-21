@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		86860C9D21E9576A009AA757 /* Common.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86860C9C21E9576A009AA757 /* Common.framework */; };
+		86A1C60222BD5E8A00F74501 /* TokenTextViewTextStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C5FD22BD5E8A00F74501 /* TokenTextViewTextStorage.swift */; };
+		86A1C60322BD5E8A00F74501 /* TokenTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C5FE22BD5E8A00F74501 /* TokenTextViewController.swift */; };
+		86A1C60422BD5E8A00F74501 /* TokenUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 86A1C5FF22BD5E8A00F74501 /* TokenUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		86A1C60522BD5E8A00F74501 /* TokenTextViewLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C60022BD5E8A00F74501 /* TokenTextViewLayoutManager.swift */; };
+		86A1C60622BD5E8A00F74501 /* PasteMediaTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C60122BD5E8A00F74501 /* PasteMediaTextView.swift */; };
+		86A1C60B22BD5E9800F74501 /* TokenTextViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C60822BD5E9800F74501 /* TokenTextViewControllerTests.swift */; };
+		86A1C60C22BD5E9800F74501 /* TokenTextViewTextStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A1C60922BD5E9800F74501 /* TokenTextViewTextStorageTests.swift */; };
+		86A1C60D22BD5E9800F74501 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 86A1C60A22BD5E9800F74501 /* Info.plist */; };
 		86BCC0E221EC7D5800A54F06 /* CommonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86BCC0E121EC7D5800A54F06 /* CommonUI.framework */; };
 		A8AC40921DA5D8CE00D644CA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8AC40841DA5D8C500D644CA /* LaunchScreen.storyboard */; };
 		A8AC40931DA5D8CE00D644CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8AC40861DA5D8C500D644CA /* Main.storyboard */; };
@@ -17,13 +25,6 @@
 		A8AC40991DA5D94E00D644CA /* TokenUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8C8609B1DA5B1EF00F4B309 /* TokenUI.framework */; };
 		A8AC409A1DA5D94E00D644CA /* TokenUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A8C8609B1DA5B1EF00F4B309 /* TokenUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A8C860A51DA5B1EF00F4B309 /* TokenUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A8C8609B1DA5B1EF00F4B309 /* TokenUI.framework */; };
-		A8C860E11DA5B2B800F4B309 /* TokenUI.h in Headers */ = {isa = PBXBuildFile; fileRef = A8C860CC1DA5B2B800F4B309 /* TokenUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A8C860E21DA5B2B800F4B309 /* PasteMediaTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860CD1DA5B2B800F4B309 /* PasteMediaTextView.swift */; };
-		A8C860E31DA5B2B800F4B309 /* TokenTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860CE1DA5B2B800F4B309 /* TokenTextViewController.swift */; };
-		A8C860E41DA5B2B800F4B309 /* TokenTextViewLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860CF1DA5B2B800F4B309 /* TokenTextViewLayoutManager.swift */; };
-		A8C860E51DA5B2B800F4B309 /* TokenTextViewTextStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860D01DA5B2B800F4B309 /* TokenTextViewTextStorage.swift */; };
-		A8C860E91DA5B2FD00F4B309 /* TokenTextViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860D31DA5B2B800F4B309 /* TokenTextViewControllerTests.swift */; };
-		A8C860EA1DA5B2FD00F4B309 /* TokenTextViewTextStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C860D41DA5B2B800F4B309 /* TokenTextViewTextStorageTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,14 @@
 /* Begin PBXFileReference section */
 		67B914721F96C1B500ECB28E /* TokenUIDemo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = TokenUIDemo.gif; sourceTree = "<group>"; };
 		86860C9C21E9576A009AA757 /* Common.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Common.framework; path = ../Carthage/Build/iOS/Common.framework; sourceTree = "<group>"; };
+		86A1C5FD22BD5E8A00F74501 /* TokenTextViewTextStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewTextStorage.swift; sourceTree = "<group>"; };
+		86A1C5FE22BD5E8A00F74501 /* TokenTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewController.swift; sourceTree = "<group>"; };
+		86A1C5FF22BD5E8A00F74501 /* TokenUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenUI.h; sourceTree = "<group>"; };
+		86A1C60022BD5E8A00F74501 /* TokenTextViewLayoutManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewLayoutManager.swift; sourceTree = "<group>"; };
+		86A1C60122BD5E8A00F74501 /* PasteMediaTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteMediaTextView.swift; sourceTree = "<group>"; };
+		86A1C60822BD5E9800F74501 /* TokenTextViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewControllerTests.swift; sourceTree = "<group>"; };
+		86A1C60922BD5E9800F74501 /* TokenTextViewTextStorageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewTextStorageTests.swift; sourceTree = "<group>"; };
+		86A1C60A22BD5E9800F74501 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86BCC0E121EC7D5800A54F06 /* CommonUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CommonUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8AC40831DA5D8C500D644CA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A8AC40851DA5D8C500D644CA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -71,14 +80,6 @@
 		A8C860A41DA5B1EF00F4B309 /* TokenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TokenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8C860C81DA5B2B800F4B309 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A8C860CA1DA5B2B800F4B309 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A8C860CC1DA5B2B800F4B309 /* TokenUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TokenUI.h; sourceTree = "<group>"; };
-		A8C860CD1DA5B2B800F4B309 /* PasteMediaTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteMediaTextView.swift; sourceTree = "<group>"; };
-		A8C860CE1DA5B2B800F4B309 /* TokenTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewController.swift; sourceTree = "<group>"; };
-		A8C860CF1DA5B2B800F4B309 /* TokenTextViewLayoutManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewLayoutManager.swift; sourceTree = "<group>"; };
-		A8C860D01DA5B2B800F4B309 /* TokenTextViewTextStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewTextStorage.swift; sourceTree = "<group>"; };
-		A8C860D21DA5B2B800F4B309 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A8C860D31DA5B2B800F4B309 /* TokenTextViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewControllerTests.swift; sourceTree = "<group>"; };
-		A8C860D41DA5B2B800F4B309 /* TokenTextViewTextStorageTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenTextViewTextStorageTests.swift; sourceTree = "<group>"; };
 		A8C8610F1DA5B71700F4B309 /* TokenUIDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenUIDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -118,6 +119,28 @@
 				86860C9C21E9576A009AA757 /* Common.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		86A1C5FC22BD5E8A00F74501 /* TokenUI */ = {
+			isa = PBXGroup;
+			children = (
+				86A1C5FD22BD5E8A00F74501 /* TokenTextViewTextStorage.swift */,
+				86A1C5FE22BD5E8A00F74501 /* TokenTextViewController.swift */,
+				86A1C5FF22BD5E8A00F74501 /* TokenUI.h */,
+				86A1C60022BD5E8A00F74501 /* TokenTextViewLayoutManager.swift */,
+				86A1C60122BD5E8A00F74501 /* PasteMediaTextView.swift */,
+			);
+			path = TokenUI;
+			sourceTree = "<group>";
+		};
+		86A1C60722BD5E9800F74501 /* TokenUITests */ = {
+			isa = PBXGroup;
+			children = (
+				86A1C60822BD5E9800F74501 /* TokenTextViewControllerTests.swift */,
+				86A1C60922BD5E9800F74501 /* TokenTextViewTextStorageTests.swift */,
+				86A1C60A22BD5E9800F74501 /* Info.plist */,
+			);
+			path = TokenUITests;
 			sourceTree = "<group>";
 		};
 		A8AC40821DA5D8C500D644CA /* Resources */ = {
@@ -184,11 +207,7 @@
 		A8C860CB1DA5B2B800F4B309 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				A8C860CC1DA5B2B800F4B309 /* TokenUI.h */,
-				A8C860CD1DA5B2B800F4B309 /* PasteMediaTextView.swift */,
-				A8C860CE1DA5B2B800F4B309 /* TokenTextViewController.swift */,
-				A8C860CF1DA5B2B800F4B309 /* TokenTextViewLayoutManager.swift */,
-				A8C860D01DA5B2B800F4B309 /* TokenTextViewTextStorage.swift */,
+				86A1C5FC22BD5E8A00F74501 /* TokenUI */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -196,9 +215,7 @@
 		A8C860D11DA5B2B800F4B309 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				A8C860D21DA5B2B800F4B309 /* Info.plist */,
-				A8C860D31DA5B2B800F4B309 /* TokenTextViewControllerTests.swift */,
-				A8C860D41DA5B2B800F4B309 /* TokenTextViewTextStorageTests.swift */,
+				86A1C60722BD5E9800F74501 /* TokenUITests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -210,7 +227,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8C860E11DA5B2B800F4B309 /* TokenUI.h in Headers */,
+				86A1C60422BD5E8A00F74501 /* TokenUI.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,6 +355,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86A1C60D22BD5E9800F74501 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,10 +439,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8C860E31DA5B2B800F4B309 /* TokenTextViewController.swift in Sources */,
-				A8C860E21DA5B2B800F4B309 /* PasteMediaTextView.swift in Sources */,
-				A8C860E41DA5B2B800F4B309 /* TokenTextViewLayoutManager.swift in Sources */,
-				A8C860E51DA5B2B800F4B309 /* TokenTextViewTextStorage.swift in Sources */,
+				86A1C60622BD5E8A00F74501 /* PasteMediaTextView.swift in Sources */,
+				86A1C60522BD5E8A00F74501 /* TokenTextViewLayoutManager.swift in Sources */,
+				86A1C60222BD5E8A00F74501 /* TokenTextViewTextStorage.swift in Sources */,
+				86A1C60322BD5E8A00F74501 /* TokenTextViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,8 +450,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A8C860EA1DA5B2FD00F4B309 /* TokenTextViewTextStorageTests.swift in Sources */,
-				A8C860E91DA5B2FD00F4B309 /* TokenTextViewControllerTests.swift in Sources */,
+				86A1C60C22BD5E9800F74501 /* TokenTextViewTextStorageTests.swift in Sources */,
+				86A1C60B22BD5E9800F74501 /* TokenTextViewControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
