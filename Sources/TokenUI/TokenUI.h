@@ -1,6 +1,6 @@
 // Copyright © 2017 Hootsuite. All rights reserved.
 
-@import UIKit;
+#import <UIKit/UIKit.h>
 
 //! Project version number for TokenUI.
 FOUNDATION_EXPORT double TokenUIVersionNumber;
