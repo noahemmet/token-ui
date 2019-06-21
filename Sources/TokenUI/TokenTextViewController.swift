@@ -464,7 +464,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
 
     /// Adds a token to the textView at the given index and informs the delegate.
     @discardableResult
-	open func addToken(_ startIndex: Int, text: String, key: Key) -> Token {
+	open func addToken(_ startIndex: Int, text: String, key: Key? = nil) -> Token {
+		let key = key ?? Key(text)
         var attrs = createNewTokenAttributes()
 		attrs[TokenTextViewControllerConstants.externalID] = key
 		let tokenRef = attrs[TokenTextViewControllerConstants.tokenAttributeReference] as! String
@@ -479,7 +480,8 @@ open class TokenTextViewController: UIViewController, UITextViewDelegate, NSLayo
     }
 	
 	@discardableResult
-	open func replaceToken(_ oldToken: Token, with newText: String, key: Key) -> Token {
+	open func replaceToken(_ oldToken: Token, with newText: String, key: Key? = nil) -> Token {
+		let key = key ?? Key(text)
 		let wasSelected: Bool = (oldToken == self.selectedToken)
 		let range: NSRange = selectedToken?.range ?? textView.selectedRange
 		self.deleteToken(oldToken.tokenRef)

@@ -20,7 +20,7 @@ class TokenTextViewTextStorageTests: XCTestCase {
         let mentionText = createMentionText()
         let tokenList = mentionText.tokenList
         if let tokenInfo = tokenList.first {
-            XCTAssertEqual(tokenInfo.reference, "token-reference")
+            XCTAssertEqual(tokenInfo.tokenRef, "token-reference")
             XCTAssertEqual(tokenInfo.text, "@davidby")
             XCTAssertEqual(tokenInfo.range.location, 6)
             XCTAssertEqual(tokenInfo.range.length, 8)
@@ -87,7 +87,7 @@ class TokenTextViewTextStorageTests: XCTestCase {
         let textStorage = TokenTextViewTextStorage()
         let originalText = NSAttributedString(string: "Hello  how are you")
         textStorage.insert(originalText, at: 0)
-        let mentionText = NSAttributedString(string: "@davidby", attributes: [TokenTextViewControllerConstants.tokenAttributeName: "token-reference"])
+        let mentionText = NSAttributedString(string: "@davidby", attributes: [TokenTextViewControllerConstants.tokenAttributeReference: "token-reference"])
         textStorage.insert(mentionText, at: 6)
         return textStorage
     }
