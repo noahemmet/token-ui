@@ -15,8 +15,8 @@ class TokenTextViewTextStorage: NSTextStorage {
     private struct Defaults {
         static let font = UIFont.preferredFont(forTextStyle: .body)
         static let linkColor = UIColor(red: 0.0, green: 174.0/255.0, blue: 239.0/255.0, alpha: 1.0)
-        static let textColor = UIColor(white: 36.0/255.0, alpha: 1.0)
-		static let textBackgroundColor = UIColor.white
+        static let textColor = UIColor.label
+		static let textBackgroundColor = UIColor.systemBackground
     }
 
     fileprivate let backingStore = NSMutableAttributedString()

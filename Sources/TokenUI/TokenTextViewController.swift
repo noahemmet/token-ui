@@ -105,7 +105,7 @@ public struct TokenTextViewControllerConstants {
 
 /// Colors for a token.
 public struct TokenDisplay {
-	public static let defaultDisplay = TokenDisplay(textColor: .white, backgroundColor: .lightGray)
+	public static let defaultDisplay = TokenDisplay(textColor: UIColor.systemBackground, backgroundColor: UIColor.tertiaryLabel)
 	public var textColor: UIColor
 	public var backgroundColor: UIColor
 	public var font: UIFont?
