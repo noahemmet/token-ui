@@ -5,8 +5,8 @@
         "package": "Common",
         "repositoryURL": "https://github.com/noahemmet/Common",
         "state": {
-          "branch": "spm",
-          "revision": "098be1c04f56aab829277649db6372b93477c60b",
+          "branch": "master",
+          "revision": "14e381c2c696e1be333c4322bfd847028bd5760c",
           "version": null
         }
       },
@@ -14,8 +14,8 @@
         "package": "CommonUI",
         "repositoryURL": "https://github.com/noahemmet/CommonUI",
         "state": {
-          "branch": "spm",
-          "revision": "c30191b6efcb07a249d9771233218c4a789fc053",
+          "branch": "master",
+          "revision": "a91c6ef6cbbbeccd367d306a326637d0432673d6",
           "version": null
         }
       }
